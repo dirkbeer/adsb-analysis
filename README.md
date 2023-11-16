@@ -25,7 +25,7 @@ The plot below is an example using 8 hours of data. It shows roughly the pattern
 
 **First-time setup**
 
-1) Install the required packages on you Wingbits Raspberry Pi:
+1) Install the required packages on your Wingbits Raspberry Pi:
    ```
    sudo apt install git python3-pip python3-venv libopenblas-dev libopenjp2-7
    ```
