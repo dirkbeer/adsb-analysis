@@ -6,38 +6,46 @@
     <title>Receiver Performance</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
- <style>
-     .carousel-item img {
-         object-fit: contain; /* Make images fit without stretching */
-         height: 80vh; /* Adjust height as needed */
-         max-height: 1080px; /* Set a max height for the images */
-     }
-     /* Ensure controls are always visible */
-     .carousel-control-prev, .carousel-control-next {
-         filter: invert(100%); /* This makes the controls white */
-         font-size: 24px; /* Increase size of the icons */
-     }
-     /* Remove the transition effect */
-     .carousel-item {
-         transition: none !important;
-     }
- </style>
+    <style>
+        .carousel-item img {
+            object-fit: contain; /* Make images fit without stretching */
+            height: 80vh; /* Adjust height as needed */
+            max-height: 1080px; /* Set a max height for the images */
+        }
+        /* Ensure controls are always visible */
+        .carousel-control-prev, .carousel-control-next {
+            filter: invert(100%); /* This makes the controls white */
+            font-size: 24px; /* Increase size of the icons */
+        }
+        /* Remove the transition effect */
+        .carousel-item {
+            transition: none !important;
+        }
+        /* Make image name text bigger */
+        #imageName {
+            font-size: 20px; /* Adjust the font size as needed */
+            font-weight: bold; /* Optional: makes the text bold */
+        }
+    </style>
 </head>
 <body>
 
 <div id="imageCarousel" class="carousel slide" data-interval="false">
-  <div class="carousel-inner" id="carousel-inner">
-    <!-- Images will be inserted here by JavaScript -->
-  </div>
-  <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="sr-only">Previous</span>
-  </a>
-  <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="sr-only">Next</span>
-  </a>
+    <div class="carousel-inner" id="carousel-inner">
+        <!-- Images will be inserted here by JavaScript -->
+    </div>
+    <a class="carousel-control-prev" href="#imageCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#imageCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
 </div>
+
+<!-- Element to display the image name -->
+<p id="imageName" class="text-center mt-2"></p>
 
 <!-- Bootstrap and jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -46,31 +54,44 @@
 <script>
 // Array of image filenames
 const imageFilenames = [
-  'receiver_performance.png',
-  'receiver_performance_previous.png',
-  // Add more image filenames here
+    'receiver_performance.png',
+    'receiver_performance_previous.png',
+    // Add more image filenames here
 ];
 
 const carouselInner = document.getElementById('carousel-inner');
 
 // Dynamically add images to the carousel
 imageFilenames.forEach((filename, index) => {
-  const div = document.createElement('div');
-  div.className = 'carousel-item' + (index === 0 ? ' active' : '');
+    const div = document.createElement('div');
+    div.className = 'carousel-item' + (index === 0 ? ' active' : '');
 
-  const img = document.createElement('img');
-  img.src = './' + filename; // Adjust the path as necessary
-  img.className = 'd-block w-100';
-  img.alt = 'Image';
+    const img = document.createElement('img');
+    img.src = './' + filename; // Adjust the path as necessary
+    img.className = 'd-block w-100';
+    img.alt = 'Image';
+    img.setAttribute('data-name', filename); // Store the filename
 
-  div.appendChild(img);
-  carouselInner.appendChild(div);
+    div.appendChild(img);
+    carouselInner.appendChild(div);
 });
 
 // Initialize carousel with no automatic cycling
 $('#imageCarousel').carousel({
-  interval: false
+    interval: false
 });
+
+// Add event listener for when the carousel slides to a new item
+$('#imageCarousel').on('slid.bs.carousel', function () {
+    var activeImage = document.querySelector('#carousel-inner .active img');
+    document.getElementById('imageName').innerText = activeImage.getAttribute('data-name');
+});
+
+// Set initial image name
+window.onload = function() {
+    var initialImage = document.querySelector('#carousel-inner .active img');
+    document.getElementById('imageName').innerText = initialImage.getAttribute('data-name');
+}
 </script>
 
 </body>
