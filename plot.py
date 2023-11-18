@@ -8,6 +8,9 @@ from kneed import KneeLocator
 import matplotlib.pyplot as plt
 from scipy.stats import binom
 
+# optionally limit plot to fixes axes to make plot-to-plot comparison easier
+limit_plot = True
+
 # Read the CSV file
 dat = pd.read_csv('output.csv', header=None)
 dat.columns = ["aircraft_id", "distance", "present"]
@@ -67,8 +70,9 @@ if knee_point[1] is not None:
 plt.title("ADS-B Receiver Performance / Message Reliability")
 plt.xlabel("Distance (nautical miles)")
 plt.ylabel("Probability of Detection")
-#plt.ylim(0.7, 1.0)
-#plt.xlim(0.0, 300.0)
+if limit_plot:
+    plt.ylim(0.7, 1.0)
+    plt.xlim(0.0, 300.0)
 plt.grid(True)
 plt.show()
 plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
