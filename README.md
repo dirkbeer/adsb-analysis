@@ -21,11 +21,11 @@ The plot below is an example using 8 hours of data. It shows roughly the pattern
 * Where this transition happens (the "knee") is a good indication of sensitivity and performance of the receiver/amplifier/filter/antenna system.
 * Note that the code tries to identify the knee range, but it doesn't always work. 
 
-![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/4244aba7-1f9b-4f98-bbc3-c5f44252286f)
+![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/e8642780-0ecc-4320-8617-c13bae5f5ce1)
 
 **First-time setup**
 
-1) Install the required packages on you Wingbits Raspberry Pi:
+1) Install the required packages on your Wingbits Raspberry Pi:
    ```
    sudo apt install git python3-pip python3-venv libopenblas-dev libopenjp2-7
    ```
