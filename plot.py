@@ -21,6 +21,7 @@ binned_data = dat.groupby('distance_bin', observed=False).agg(
     total_count=('present', 'count')
 ).reset_index()
 binned_data['proportion'] = binned_data['present_count'] / binned_data['total_count']
+binned_data['proportion'] = np.where(binned_data['total_count'] < 30, np.nan, binned_data['proportion'])
 
 # Calculate the confidence intervals
 def binom_confint(successes, trials):
@@ -43,23 +44,34 @@ def extract_upper_bound(interval):
 
 binned_data['distance'] = binned_data['distance_bin'].apply(extract_upper_bound)
 
-# Find the knee in the curve
-kn = KneeLocator(binned_data['distance'], binned_data['proportion'], S=2.0, curve='concave', direction='decreasing')
-knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0])
+# Filter the data to include only rows where total_count > 30 to ensure valid statistics
+filtered_data = binned_data[binned_data['total_count'] > 30]
 
-# Plot with confidence intervals
+# Find the knee in the curve using filtered data
+kn = KneeLocator(filtered_data['distance'], filtered_data['proportion'], 
+                 curve='concave', direction='decreasing',
+                 S=1.0, interp_method='polynomial', online=True)  # parameters that seem to work for the ADS-B data
+knee_point = (kn.knee, filtered_data.loc[filtered_data['distance'] == kn.knee, 'proportion'].values[0] if kn.knee is not None else None)
+
+# Plot with confidence intervals using filtered data
 plt.figure(figsize=(10, 8))
-plt.errorbar(binned_data['distance'], binned_data['proportion'], yerr=[binned_data['proportion'] - binned_data['conf_low'], binned_data['conf_high'] - binned_data['proportion']], fmt='o')
-plt.scatter(*knee_point, color='red')
-plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0], knee_point[1]))
+plt.errorbar(filtered_data['distance'], filtered_data['proportion'], 
+             yerr=[filtered_data['proportion'] - filtered_data['conf_low'], 
+                   filtered_data['conf_high'] - filtered_data['proportion']], fmt='o')
+
+# Only plot the knee point if it exists
+if knee_point[1] is not None:
+    plt.scatter(*knee_point, color='red')
+    plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0], knee_point[1]))
+
 plt.title("ADS-B Receiver Performance / Message Reliability")
 plt.xlabel("Distance (nautical miles)")
 plt.ylabel("Probability of Detection")
-plt.ylim(0.7, 1.0)
-plt.xlim(0.0, 300.0)
+#plt.ylim(0.7, 1.0)
+#plt.xlim(0.0, 300.0)
 plt.grid(True)
 plt.show()
+plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
 
 # Save the plot
 plt.savefig("receiver_performance.png")
-

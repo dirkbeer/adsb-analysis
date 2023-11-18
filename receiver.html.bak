@@ -23,19 +23,20 @@
             color: black; /* Change caption text to black */
         }
 
-.carousel-item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0; /* Make the images transparent by default */
-}
-
-.carousel-item.active {
-    opacity: 1; /* Make the active item fully visible */
-    transition: opacity 0.5s ease-in-out; /* We'll keep the transition duration short. */
-}
+        /* Crossfade effect */
+        .carousel-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 2.0s ease-in-out;
+        }
+        .carousel-item.active {
+            opacity: 1;
+            position: relative; /* Required for the active item to be positioned above the others */
+        }
     </style>
 </head>
 <body>
@@ -74,28 +75,23 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-$(document).ready(function () {
-    $('#carouselExampleIndicators').on('slide.bs.carousel', function (e) {
-        var $active = $(e.currentTarget).find('.carousel-item.active');
-        var $next = $(e.relatedTarget);
-        
-        // Initialize the next item's opacity to 0
-        $next.css({ opacity: 0 }).addClass('active');
-        
-        // Animate the opacity of the next item to 1 at the same rate as the active item transitions to 0
-        $next.animate({ opacity: 1 }, {
-            duration: 500,
-            queue: false,
-            progress: function(animation, progress, remainingMs) {
-                $active.css('opacity', 1 - progress);
-            },
-            complete: function() {
-                $active.removeClass('active').css('opacity', 0);
-            }
-        });
-    });
-});
+// Handle the crossfade transition
+$('#carouselExampleIndicators').on('slide.bs.carousel', function (e) {
+    var $carousel = $(e.currentTarget);
+    var $carouselInner = $carousel.find('.carousel-inner');
+    var $items = $carouselInner.find('.carousel-item');
+    var $activeItem = $carouselInner.find('.carousel-item.active');
+    var $nextItem = $(e.relatedTarget);
 
+    $items.css('opacity', 0); // Set all items to transparent
+
+    $nextItem.addClass('active').css('opacity', 0); // Set the next item to active but transparent
+
+    setTimeout(function () {
+        $activeItem.removeClass('active').css('opacity', 0); // Set the previous item to transparent and inactive
+        $nextItem.css('opacity', 1); // Set the next item to fully visible
+    }, 0);
+});
 </script>
 
 </body>
