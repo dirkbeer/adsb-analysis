@@ -16,7 +16,7 @@ def extract_upper_bound(interval):
     parts = interval_str.split(',')
     return float(parts[1].strip())
 
-def main(dynamic_limits):
+def main(dynamic_limits, figure_filename):
     # Read the CSV file
     dat = pd.read_csv('output.csv', header=None)
     dat.columns = ["aircraft_id", "distance", "present"]
@@ -71,11 +71,12 @@ def main(dynamic_limits):
     plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
 
     # Save the plot
-    plt.savefig("receiver_performance.png")
+    plt.savefig(figure_filename)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to analyze ADS-B Receiver Performance")
     parser.add_argument('--dynamic-limits', '-dl', action='store_true', help='Use dynamic limits to ensure all data is visible')
+    parser.add_argument('--figure-filename', '-ffn', type=str, default='receiver_performance.png', help='Filename for the saved plot')
     args = parser.parse_args()
 
-    main(args.dynamic_limits)
+    main(args.dynamic_limits, args.figure_filename)
