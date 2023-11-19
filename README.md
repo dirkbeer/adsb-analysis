@@ -21,7 +21,7 @@ The plot below is an example using 8 hours of data. It shows roughly the pattern
 * Where this transition happens (the "knee") is a good indication of sensitivity and performance of the receiver/amplifier/filter/antenna system.
 * Note that the code tries to identify the knee range, but it doesn't always work. 
 
-![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/e8642780-0ecc-4320-8617-c13bae5f5ce1)
+![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/20c3854a-430c-4077-aba2-3309f6fc5364)
 
 **First-time setup**
 
