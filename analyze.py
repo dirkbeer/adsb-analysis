@@ -131,7 +131,7 @@ def main():
     binned_data['proportion'] = binned_data['present_count'] / binned_data['total_count']
 
     # Filter the data to include only rows where total_count > 30 to ensure valid statistics
-    if not use_all:
+    if not args.use_all:
         pre_filter_bin_count = len(binned_data)
         binned_data = binned_data[binned_data['total_count'] >= 30]
         post_filter_bin_count = len(binned_data)
@@ -167,7 +167,7 @@ def main():
     plt.title("ADS-B Receiver Performance / Message Reliability")
     plt.xlabel("Distance (nautical miles)")
     plt.ylabel("Probability of Detection")
-    if not dynamic_limits:
+    if not args.dynamic_limits:
         plt.ylim(0.7, 1.0)
         plt.xlim(0.0, 300.0)
     plt.grid(True)
@@ -175,7 +175,7 @@ def main():
     plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
 
     # Save the plot
-    plt.savefig(figure_filename)
+    plt.savefig(args.figure_filename)
 
 if __name__ == "__main__":
     main()
