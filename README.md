@@ -56,20 +56,30 @@ The plot below is an example using 8 hours of data. It shows roughly the pattern
    ```
    source venv/bin/activate
    ```
-3) Run the data processing script. It reads your home location from the readsb config file, processes the data, and outputs `output.csv`
+3) Run the script. It reads your home location from the readsb config file, processes the data, calculates detection probability and then saves a file called `receiver_performance.png`
    ```
-    ./process.py
+    ./analyze.py
     ```
-4) Run the analysis and plotting script. It does calculates detection probability and then saves a file called `receiver_performance.png`
-    ```
-    ./plot.py
-    ```
-5) Copy the image to the web server directory:
+4) Copy the image to the web server directory:
     ```
     sudo cp ./receiver_performance.png /usr/local/share/tar1090/html
     ```
-6) Go view the receiver performance plot at
+5) Go view the receiver performance plot at
     ```
     http://sdr.local/tar1090/receiver_performance.png
     ```
     (replace `sdr.local` with the name or ip address of your Wingbits Raspberry Pi)
+
+
+**Command line options**
+```
+usage: analyze.py [-h] [--dynamic-limits] [--use-all] [--figure-filename FIGURE_FILENAME]
+
+Script to analyze ADS-B Receiver Performance
+
+optional arguments:
+  -h, --help                                                Show this help message and exit
+  --dynamic-limits, -dl                                     Use dynamic limits to ensure all data is visible
+  --use-all, -a                                             Calculate statistics on range bins even if there is insufficient data for valid statistics
+  --figure-filename FIGURE_FILENAME, -ffn FIGURE_FILENAME   Filename for the saved plot
+```
