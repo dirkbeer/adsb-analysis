@@ -40,6 +40,7 @@ def extract_lat_lon_from_config(config_file_path):
     else:
         print("Latitude and longitude not found in the readsb config file.")
         print("You can set your location using \"sudo readsb-set-location <lat> <lon>\"")
+        print("")
         exit(1)
 
 def haversine(lat1, lon1, lat2, lon2):
