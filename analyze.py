@@ -110,13 +110,15 @@ def main():
             data_per_time_and_aircraft[d.time] = {}
         data_per_time_and_aircraft[d.time][d.aircraft_id] = d
 
-    dat = []
+    output_data = []
     sorted_times = sorted(times)
     for i, current_time in enumerate(sorted_times):
         next_time = sorted_times[i + 1] if i + 1 < len(sorted_times) else None
         for aircraft_id, d in data_per_time_and_aircraft[current_time].items():
             present_in_next = next_time is not None and aircraft_id in data_per_time_and_aircraft[next_time]
-            dat.append((aircraft_id, d.distance, int(present_in_next)))
+            output_data.append((aircraft_id, d.distance, int(present_in_next)))
+    
+    dat = pd.DataFrame(output_data, columns=["aircraft_id", "distance", "present"])
 
     # Bin the distances into intervals and calculate the proportion of presence
     dat['distance_bin'] = pd.cut(dat['distance'], bins=np.arange(0, dat['distance'].max() + 10, 10), include_lowest=True, right=False)
