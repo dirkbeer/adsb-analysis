@@ -173,7 +173,8 @@ def main():
         plt.scatter(*knee_point, color='red')
         plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0], knee_point[1]))
 
-    plt.title(f"ADS-B Receiver Performance / Message Reliability\nData Range: {date_range_str}")
+    #plt.title(f"ADS-B Receiver Performance / Message Reliability\nData Range: {date_range_str}")
+    plt.title(f"ADS-B Receiver Performance / Message Reliability")
     plt.xlabel("Distance (nautical miles)")
     plt.ylabel("Probability of Detection")
     if not args.dynamic_limits:
