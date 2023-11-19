@@ -71,12 +71,12 @@ class Data:
         self.datetime = datetime.datetime.utcfromtimestamp(self.time / 1000)
 
 def get_knee_point(binned_data):
-    #kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
-    #                 curve='concave', direction='decreasing',
-    #                 S=1.0, interp_method='polynomial', polynomial_degree=7, online=False)
+    piecewise_params0 = (np.mean(binned_data['distance']), np.max(binned_data['proportion']), \
+                        (np.min(binned_data['proportion']) - np.max(binned_data['proportion'])) \
+                        / (np.max(binned_data['distance']) - np.mean(binned_data['distance'])) )
     kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
                      curve='concave', direction='decreasing',
-                     interp_method='piecewise', online=False)
+                     interp_method='piecewise', piecewise_params=piecewise_params0, online=False)
     if kn.knee is not None:
         knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0])
     else:

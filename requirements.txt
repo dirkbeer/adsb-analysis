@@ -2,4 +2,4 @@ numpy
 matplotlib
 scipy
 pandas
-git+https://github.com/dirkbeer/kneed.git
+git+https://github.com/dirkbeer/kneed.git@piecewise-improvements
