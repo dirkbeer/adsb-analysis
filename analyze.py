@@ -71,6 +71,9 @@ class Data:
         self.datetime = datetime.datetime.utcfromtimestamp(self.time / 1000)
 
 def get_knee_point(binned_data):
+    #kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
+    #                 curve='concave', direction='decreasing',
+    #                 S=1.0, interp_method='polynomial', polynomial_degree=7, online=False)
     kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
                      curve='concave', direction='decreasing',
                      interp_method='piecewise', online=False)
