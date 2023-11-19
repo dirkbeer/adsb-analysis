@@ -22,6 +22,10 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
 
 ![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/50ad5353-8fda-4dac-9223-5b6f663862c1)
 
+**Requires**
+
+&nbsp;&nbsp;&nbsp;&nbsp;[readsb](https://github.com/wiedehopf/readsb), which is included in the wingbits.com install
+<br><br>
 
 **Setup** (run again to update to latest)
 ```bash
