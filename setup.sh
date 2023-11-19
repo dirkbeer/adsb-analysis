@@ -80,10 +80,11 @@ install_python_packages() {
 
 # Print completion message
 print_completion() {
+    cd adsb-analysis || error "Failed to enter the adsb-analysis directory."
     success "Setup completed successfully."
-    echo "To activate the virtual environment and run the analysis, execute:"
-    echo "source venv/bin/activate"
-    echo "./analyze.py"
+    echo "To run the analysis, execute:"
+    echo "cd adsb-analysis"
+    echo "./run_analysis.sh"
 }
 
 # Start the script
