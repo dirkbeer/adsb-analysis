@@ -2,6 +2,10 @@
 
 import sys
 import os
+# Check if the virtual environment is already active
+if not hasattr(sys, 'real_prefix'):
+    activate_venv()
+
 import gzip
 import json
 import glob
@@ -84,9 +88,6 @@ def extract_upper_bound(interval):
 
 # Integrated main function
 def main():
-    # Check if the virtual environment is already active
-    if not hasattr(sys, 'real_prefix'):
-        activate_venv()
 
     # Process command line arguments
     parser = argparse.ArgumentParser(description="Script to analyze ADS-B Receiver Performance")
