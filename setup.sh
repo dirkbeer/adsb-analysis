@@ -109,6 +109,20 @@ print_completion() {
     echo "./run_analysis.sh"
 }
 
+# Print completion message
+print_completion() {
+    echo "\n"
+    success "Setup completed successfully."
+    echo "To run the analysis, execute:"
+    
+    local script_path="adsb-analysis/run_analysis.sh"
+    if [ -f "$script_path" ]; then
+        echo "cd adsb-analysis"
+    fi
+    echo "./run-analysis.sh"
+    echo "\n"
+}
+
 # Start the script
 install_packages
 update_repository
