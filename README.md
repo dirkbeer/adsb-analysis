@@ -14,58 +14,62 @@ The intervals used are those in the tar1090 data, specified by `INTERVAL` in `/e
 
 To get a good dataset for this analysis, you should have tar1090 collect more data. For example, try setting `HISTORY_SIZE=1800` in `/etc/default/tar1090` (4 hours), and running the analysis around 2pm to capture the 10ma-2pm midday air traffic.
 
-The plot below is an example using 8 hours of data. It shows roughly the pattern expected in theory:
+The plot below is an example using 4 hours of data. It shows roughly the pattern expected in theory:
 
 * The P(D) stays high (90%-100%) at low ranges where the signal is well above the detection threshold of the receiver. 
 * At the range where the signal gets near the detection threshold, P(D) starts dropping rapidly.
 * Where this transition happens (the "knee") is a good indication of sensitivity and performance of the receiver/amplifier/filter/antenna system.
 * Note that the code tries to identify the knee range, but it doesn't always work. 
 
-![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/20c3854a-430c-4077-aba2-3309f6fc5364)
+![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/c886a056-473b-4d5b-b506-6a182b4e70b9)
 
 **First-time setup**
 
 1) Install the required packages on your Wingbits Raspberry Pi:
-   ```
+   ```bash
    sudo apt install git python3-pip python3-venv libopenblas-dev libopenjp2-7
    ```
 2) Clone this repository
-   ```
+   ```bash
    git clone https://github.com/dirkbeer/adsb-analysis.git
    ```
 3) Go to the adsb-analysis folder
-   ```
+   ```bash
    cd adsb-analysis
    ```
 4) Create a Python virtual environment and start it: 
-   ```
+   ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
     You should see your prompt change to something like
-    ```
+    ```bash
     (venv) sdr@sdr:~/adsb-analysis $
     ```
 5) Install the required Python packages (this will take a while): 
-   ```
+   ```bash
    pip install numpy matplotlib scipy pandas kneed
+   ```
+   or
+   ```bash
+   pip install -r requirements.txt
    ```
 
 **Running the analysis**
 1) Go to the adsb-analysis directory. If you're not already at a (venv) prompt, run
-   ```
+   ```bash
    source venv/bin/activate
    ```
 3) Run the script. It reads your home location from the readsb config file, processes the data, calculates detection probability and then saves a file called `receiver_performance.png`
-   ```
+   ```bash
     ./analyze.py
     ```
 4) Copy the image to the web server directory:
-    ```
+    ```bash
     sudo cp ./receiver_performance.png /usr/local/share/tar1090/html
     ```
 5) Go view the receiver performance plot at
-    ```
+    ```txt
     http://sdr.local/tar1090/receiver_performance.png
     ```
     (replace `sdr.local` with the name or ip address of your Wingbits Raspberry Pi)
