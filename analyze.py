@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+import os
 import gzip
 import json
 import glob
@@ -16,6 +18,14 @@ from scipy.stats import binom
 # Global variables from the first script
 data_dir = '/run/tar1090'
 config_file_path = '/etc/default/readsb'
+
+def activate_venv():
+    venv_path = "/path/to/your/venv"
+
+    # Activate the virtual environment
+    activate_this = os.path.join(venv_path, "bin/activate_this.py")
+    with open(activate_this) as file_:
+        exec(file_.read(), dict(__file__=activate_this))
 
 # Function definitions from the first script
 def extract_lat_lon_from_config(config_file_path):
@@ -74,6 +84,10 @@ def extract_upper_bound(interval):
 
 # Integrated main function
 def main():
+    # Check if the virtual environment is already active
+    if not hasattr(sys, 'real_prefix'):
+        activate_venv()
+
     # Process command line arguments
     parser = argparse.ArgumentParser(description="Script to analyze ADS-B Receiver Performance")
     parser.add_argument('--dynamic-limits', '-dl', action='store_true', help='Use dynamic limits to ensure all data is visible')
