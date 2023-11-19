@@ -116,7 +116,7 @@ print_completion() {
     echo ""
     echo "To run the analysis, execute:"
     echo ""
-    echo "    ./adsb-analysis/run_analysis.sh"
+    echo "    ~/adsb-analysis/run_analysis.sh"
     echo ""
 }
 
