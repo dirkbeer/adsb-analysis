@@ -14,7 +14,7 @@ The intervals used are those in the tar1090 data, specified by `INTERVAL` in `/e
 
 To get a good dataset for this analysis, you should have tar1090 collect more data. For example, try setting `HISTORY_SIZE=1800` in `/etc/default/tar1090` (4 hours), and running the analysis around 2pm to capture the 10ma-2pm midday air traffic.
 
-The plot below is an example using 8 hours of data. It shows roughly the pattern expected in theory:
+The plot below is an example using 4 hours of data. It shows roughly the pattern expected in theory:
 
 * The P(D) stays high (90%-100%) at low ranges where the signal is well above the detection threshold of the receiver. 
 * At the range where the signal gets near the detection threshold, P(D) starts dropping rapidly.
