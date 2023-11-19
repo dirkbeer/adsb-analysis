@@ -79,7 +79,7 @@ def get_knee_point(binned_data):
                      interp_method='piecewise', online=False)
     if kn.knee is not None:
         knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0])
-    else
+    else:
         print("Unable to determine knee point")
         knee_point = (None, None)
     return knee_point
