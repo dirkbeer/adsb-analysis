@@ -104,6 +104,14 @@ def main():
             print(f"OS error occurred with file {filename}: {e}")
             continue
 
+    # After processing all data, calculate the earliest and latest dates
+    if all_data:
+        earliest_date = min(d.datetime for d in all_data)
+        latest_date = max(d.datetime for d in all_data)
+        date_range_str = f"{earliest_date.strftime('%Y-%m-%d')} to {latest_date.strftime('%Y-%m-%d')}"
+    else:
+        date_range_str = "No data available"
+
     times = {d.time for d in all_data}
     data_per_time_and_aircraft = {}
     for d in all_data:
@@ -165,7 +173,7 @@ def main():
         plt.scatter(*knee_point, color='red')
         plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0], knee_point[1]))
 
-    plt.title("ADS-B Receiver Performance / Message Reliability")
+    plt.title(f"ADS-B Receiver Performance / Message Reliability\nData Range: {date_range_str}")
     plt.xlabel("Distance (nautical miles)")
     plt.ylabel("Probability of Detection")
     if not args.dynamic_limits:
