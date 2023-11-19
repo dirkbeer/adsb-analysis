@@ -1,17 +1,26 @@
 #!/usr/bin/env python3
+import sys
 
-import gzip
-import json
-import glob
-import math
-import datetime
-import re
-import argparse
-import pandas as pd
-import numpy as np
-from kneed import KneeLocator
-import matplotlib.pyplot as plt
-from scipy.stats import binom
+def is_running_in_venv():
+    return sys.prefix != sys.base_prefix
+
+if is_running_in_venv():
+    print("Running in a virtual environment.")
+    import gzip
+    import json
+    import glob
+    import math
+    import datetime
+    import re
+    import argparse
+    import pandas as pd
+    import numpy as np
+    from kneed import KneeLocator
+    import matplotlib.pyplot as plt
+    from scipy.stats import binom
+else:
+    print("Not running in the virtual environment. Run \"source venv/bin/activate\" first. ")
+    sys.exit(1)
 
 # Global variables from the first script
 data_dir = '/run/tar1090'
