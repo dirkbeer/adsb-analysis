@@ -71,6 +71,7 @@ class Data:
         self.datetime = datetime.datetime.utcfromtimestamp(self.time / 1000)
 
 def get_knee_point(binned_data):
+    binned_data['distance'] = binned_data['distance'].astype(float)
     piecewise_params0 = (np.mean(binned_data['distance']), np.max(binned_data['proportion']), \
                         (np.min(binned_data['proportion']) - np.max(binned_data['proportion'])) \
                         / (np.max(binned_data['distance']) - np.mean(binned_data['distance'])) )
