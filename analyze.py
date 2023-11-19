@@ -118,7 +118,16 @@ def main():
     if all_data:
         earliest_date = min(d.datetime for d in all_data)
         latest_date = max(d.datetime for d in all_data)
-        date_range_str = f"{earliest_date.strftime('%Y-%m-%d %H:%M')} to {latest_date.strftime('%Y-%m-%d %H:%M')}"
+        # Calculate the time difference
+        time_difference = latest_date - earliest_date
+        total_seconds = time_difference.total_seconds()
+        hours = int(total_seconds // 3600)
+        minutes = int((total_seconds % 3600) // 60)
+
+        # Format the date range string with hours and minutes
+        date_range_str = (f"{earliest_date.strftime('%Y-%m-%d %H:%M')} to "
+                          f"{latest_date.strftime('%Y-%m-%d %H:%M')} "
+                          f"({hours} hours, {minutes} minutes)")
     else:
         date_range_str = "No data available"
 
