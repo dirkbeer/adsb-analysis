@@ -1,5 +1,5 @@
 numpy
-pandas
-kneed
 matplotlib
 scipy
+pandas
+git+https://github.com/dirkbeer/kneed.git
