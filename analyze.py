@@ -195,7 +195,7 @@ def main():
         post_filter_bin_count = len(binned_data)
         filtered_bins = pre_filter_bin_count - post_filter_bin_count 
         if filtered_bins > 1:        # It's normal for the last bin to have too few messages, don't bother the user if there is only one bin filtered
-            print(f"Filtering {filtered_bins} range bins because they had to few messages for valid statistics. Set --use-all on the command line to override.")
+            print(f"Filtering {filtered_bins} range bins because they had to few messages for valid statistics. Uncomment \"./analyze.py --use-all\" in run_analysis.sh to override")
 
     # Calculate the confidence intervals
     binned_data[['conf_low', 'conf_high']] = binned_data.apply(
