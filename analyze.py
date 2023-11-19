@@ -38,9 +38,8 @@ def extract_lat_lon_from_config(config_file_path):
         lon = float(match.group(2))
         return lat, lon
     else:
-        print("Latitude and longitude not found in the readsb config file.")
-        print("You can set your location using \"sudo readsb-set-location <lat> <lon>\"")
-        print("")
+        print("Latitude and longitude not found in the readsb config file.\n")
+        print("Set your location using \"sudo readsb-set-location <lat> <lon>\" and try again.\n")
         exit(1)
 
 def haversine(lat1, lon1, lat2, lon2):
