@@ -23,11 +23,17 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
 ![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/c886a056-473b-4d5b-b506-6a182b4e70b9)
 
 
-**Easy setup & update** (coding in progress, use at your own risk)
-Run
-   ```bash
-   curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh | bash
-   ```
+**Setup** (run again to update to latest)
+```bash
+curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh | bash
+```
+
+**Running the analysis**
+```bash
+./run_analysis.sh
+```
+
+************** Manual install and running ***************
 
 **First-time setup**
 
