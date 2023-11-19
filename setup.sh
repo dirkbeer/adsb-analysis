@@ -29,8 +29,25 @@ install_packages() {
 # Check if the repository already exists and update it
 update_repository() {
     if [ -d "adsb-analysis/.git" ]; then
-        echo "Updating the existing adsb-analysis repository..."
+        echo "Checking for local changes in the existing adsb-analysis repository..."
         cd adsb-analysis
+        # Check for uncommitted changes in the git directory
+        if ! git diff-index --quiet HEAD --; then
+            # Prompt the user for action on local changes
+            read -p "Local changes detected. Would you like to overwrite them? (y/N): " user_choice
+            case $user_choice in
+                [Yy]* )
+                    echo "Overwriting local changes..."
+                    git reset --hard HEAD
+                    git clean -fd
+                    ;;
+                * )
+                    echo "Keeping local changes. Update cancelled."
+                    exit 0
+                    ;;
+            esac
+        fi
+        echo "Updating repository..."
         git pull || error "Failed to update repository."
     else
         clone_repository
