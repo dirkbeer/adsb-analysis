@@ -71,6 +71,47 @@ class Data:
         self.datetime = datetime.datetime.utcfromtimestamp(self.time / 1000)
 
 # Function definitions from the second script
+def get_knee_point(binned_data):
+    kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
+                     curve='concave', direction='decreasing',
+                     interp_method='piecewise', online=False)
+    knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0] if kn.knee is not None else None)
+import pandas as pd
+import warnings
+from kneed import KneeLocator
+from scipy.optimize import OptimizeWarning
+
+def get_knee_point(binned_data):
+    # Input validation
+    if not isinstance(binned_data, pd.DataFrame):
+        return "Error: The input is not a pandas DataFrame."
+
+    required_columns = ['distance', 'proportion']
+    if not all(column in binned_data.columns for column in required_columns):
+        return f"Error: DataFrame must contain the following columns: {required_columns}"
+
+    try:
+        # Using warnings.catch_warnings to handle specific runtime warnings
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")  # Change to 'error' to raise exceptions instead of warnings
+            kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
+                             curve='concave', direction='decreasing',
+                             interp_method='piecewise', online=False)
+
+            # Check if any warnings were raised
+            if w:
+                warning_msgs = "\n".join([str(warning.message) for warning in w])
+                return f"Warning encountered: \n{warning_msgs}"
+
+            knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0]) if kn.knee is not None else None
+            return knee_point
+
+    except OptimizeWarning as e:
+        return f"Optimize Warning encountered: {e}"
+
+    except Exception as e:
+        return f"An unexpected error occurred: {e}"
+
 def binom_confint(successes, trials):
     if trials == 0:
         return np.nan, np.nan
@@ -176,22 +217,13 @@ def main():
     # Extract the far ranges from the bin name
     binned_data['distance'] = binned_data['distance_bin'].apply(extract_upper_bound)
 
-    # Find the knee in the curve using filtered data
-    #    finetune by pasting data here: https://arvkevi-kneed.streamlit.app/
-    #kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
-    #                 curve='concave', direction='decreasing',
-    #                 S=1.0, interp_method='polynomial', polynomial_degree=7, online=False)
-    kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
-                     curve='concave', direction='decreasing',
-                     interp_method='piecewise', online=False)
-    knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0] if kn.knee is not None else None)
-
     # Plot with confidence intervals using filtered data
     plt.figure(figsize=(10, 8))
     plt.errorbar(binned_data['distance'], binned_data['proportion'], 
                  yerr=[binned_data['proportion'] - binned_data['conf_low'], 
                        binned_data['conf_high'] - binned_data['proportion']], fmt='o')
 
+    knee_point = get_knee_point(binned_data)
     if knee_point[1] is not None:
         plt.scatter(*knee_point, color='red')
         plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0]+2, knee_point[1]))
