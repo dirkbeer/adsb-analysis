@@ -178,9 +178,12 @@ def main():
 
     # Find the knee in the curve using filtered data
     #    finetune by pasting data here: https://arvkevi-kneed.streamlit.app/
+    #kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
+    #                 curve='concave', direction='decreasing',
+    #                 S=1.0, interp_method='polynomial', polynomial_degree=7, online=False)
     kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
                      curve='concave', direction='decreasing',
-                     S=1.0, interp_method='polynomial', polynomial_degree=7, online=False)
+                     interp_method='piecewise', online=False)
     knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0] if kn.knee is not None else None)
 
     # Plot with confidence intervals using filtered data
