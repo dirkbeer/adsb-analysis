@@ -26,36 +26,55 @@ install_packages() {
     sudo apt install -y git python3-pip python3-venv libopenblas-dev libopenjp2-7 || error "Failed to install required packages."
 }
 
-# Check if the repository already exists and update it
 update_repository() {
-    if [ -d "adsb-analysis/.git" ]; then
+    if [ -d ".git" ]; then
+        # Assuming the .git directory is in the current directory, no need to cd into "adsb-analysis"
         echo "Checking for local changes in the existing adsb-analysis repository..."
-        cd adsb-analysis
-        # Check for uncommitted changes in the git directory
-        if ! $NON_INTERACTIVE && ! git diff-index --quiet HEAD --; then
-            # Prompt the user for action on local changes
-            read -p "Local changes detected. Would you like to overwrite them? (y/N): " user_choice
-            case $user_choice in
-                [Yy]* )
-                    echo "Overwriting local changes..."
-                    git reset --hard HEAD
-                    git clean -fd
-                    ;;
-                * )
-                    echo "Keeping local changes. Update cancelled."
-                    exit 0
-                    ;;
-            esac
-        elif $NON_INTERACTIVE; then
-            echo "Non-interactive mode detected. Overwriting local changes..."
-            git reset --hard HEAD
-            git clean -fd
-        fi
-        echo "Updating repository..."
-        git pull || error "Failed to update repository."
+        
+        # Rest of the function remains the same
+        # ...
     else
         clone_repository
     fi
+}
+
+# Check if the repository already exists and update it
+update_repository() {
+    local repo_path="adsb-analysis"
+    
+    # Check if the repository is in the current directory
+    if [ -d "$repo_path/.git" ]; then
+        echo "Checking for local changes in the existing $repo_path repository..."
+        cd "$repo_path"
+    elif [ -d ".git" ]; then
+        echo "Checking for local changes in the existing repository..."
+    else
+        clone_repository
+        return
+    fi
+
+    # Check for uncommitted changes in the git directory
+    if ! $NON_INTERACTIVE && ! git diff-index --quiet HEAD --; then
+        # Prompt the user for action on local changes
+        read -p "Local changes detected. Would you like to overwrite them? (y/N): " user_choice
+        case $user_choice in
+            [Yy]* )
+                echo "Overwriting local changes..."
+                git reset --hard HEAD
+                git clean -fd
+                ;;
+            * )
+                echo "Keeping local changes. Update cancelled."
+                exit 0
+                ;;
+        esac
+    elif $NON_INTERACTIVE; then
+        echo "Non-interactive mode detected. Overwriting local changes..."
+        git reset --hard HEAD
+        git clean -fd
+    fi
+    echo "Updating repository..."
+    git pull || error "Failed to update repository."
 }
 
 # Clone the repository
