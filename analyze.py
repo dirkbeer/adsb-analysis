@@ -26,7 +26,6 @@ else:
 data_dir = '/run/tar1090'
 config_file_path = '/etc/default/readsb'
 
-# Function definitions from the first script
 def extract_lat_lon_from_config(config_file_path):
     with open(config_file_path, 'r') as file:
         config_content = file.read()
@@ -39,7 +38,9 @@ def extract_lat_lon_from_config(config_file_path):
         lon = float(match.group(2))
         return lat, lon
     else:
-        return None, None
+        print("Latitude and longitude not found in the readsb config file.")
+        print("You can set your location using \"sudo readsb-set-location <lat> <lon>\"")
+        exit(1)
 
 def haversine(lat1, lon1, lat2, lon2):
     R = 6371.0  # Radius of the Earth in kilometers
