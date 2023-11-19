@@ -21,7 +21,7 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
 * Where this transition happens (the "knee") is a good indication of sensitivity and performance of the receiver/amplifier/filter/antenna system.
 * Note that the code tries to identify the knee range, but it doesn't always work. 
 
-![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/20c3854a-430c-4077-aba2-3309f6fc5364)
+![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/c886a056-473b-4d5b-b506-6a182b4e70b9)
 
 **First-time setup**
 
@@ -76,7 +76,7 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
 
 
 **Command line options**
-```bash
+```
 usage: analyze.py [-h] [--dynamic-limits] [--use-all] [--figure-filename FIGURE_FILENAME]
 
 Script to analyze ADS-B Receiver Performance
