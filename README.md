@@ -30,12 +30,12 @@ curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh
 
 **Running the analysis**
 ```bash
-./run_analysis.sh
+~/adsb-analysis/run_analysis.sh
 ```
 
 **Command line options**
 
-Don't use these routinely unless you know what you are doing and have a specific reason.
+Don't use these routinely unless you understand them and have a specific reason.
 
 ```
 usage: analyze.py [-h] [--dynamic-limits] [--use-all] [--figure-filename FIGURE_FILENAME]
