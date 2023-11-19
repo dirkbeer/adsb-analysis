@@ -32,7 +32,7 @@ update_repository() {
         echo "Checking for local changes in the existing adsb-analysis repository..."
         cd adsb-analysis
         # Check for uncommitted changes in the git directory
-        if ! git diff-index --quiet HEAD --; then
+        if ! $NON_INTERACTIVE && ! git diff-index --quiet HEAD --; then
             # Prompt the user for action on local changes
             read -p "Local changes detected. Would you like to overwrite them? (y/N): " user_choice
             case $user_choice in
@@ -46,6 +46,10 @@ update_repository() {
                     exit 0
                     ;;
             esac
+        elif $NON_INTERACTIVE; then
+            echo "Non-interactive mode detected. Overwriting local changes..."
+            git reset --hard HEAD
+            git clean -fd
         fi
         echo "Updating repository..."
         git pull || error "Failed to update repository."
