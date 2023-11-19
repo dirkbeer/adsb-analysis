@@ -111,7 +111,7 @@ print_completion() {
 
 # Print completion message
 print_completion() {
-    echo "\n"
+    echo ""
     success "Setup completed successfully."
     echo "To run the analysis, execute:"
     
@@ -120,7 +120,7 @@ print_completion() {
         echo "cd adsb-analysis"
     fi
     echo "./run-analysis.sh"
-    echo "\n"
+    echo ""
 }
 
 # Start the script
