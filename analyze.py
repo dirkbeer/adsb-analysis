@@ -1,18 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-import os
-def activate_venv():
-    venv_path = "/path/to/your/venv"
-
-    # Activate the virtual environment
-    activate_this = os.path.join(venv_path, "bin/activate_this.py")
-    with open(activate_this) as file_:
-        exec(file_.read(), dict(__file__=activate_this))
-# Check if the virtual environment is already active
-if not hasattr(sys, 'real_prefix'):
-    activate_venv()
-
 import gzip
 import json
 import glob
