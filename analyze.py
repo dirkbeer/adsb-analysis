@@ -70,41 +70,12 @@ class Data:
         self.distance /= 1852  # Convert to nautical miles
         self.datetime = datetime.datetime.utcfromtimestamp(self.time / 1000)
 
-import pandas as pd
-from kneed import KneeLocator
-import numpy as np
-
 def get_knee_point(binned_data):
-    # Input validation
-    if not isinstance(binned_data, pd.DataFrame):
-        return (None, None)
-
-    required_columns = ['distance', 'proportion']
-    if not all(column in binned_data.columns for column in required_columns):
-        return (None, None)
-
-    try:
-        # Suppressing all warnings
-        np.warnings.filterwarnings('ignore')
-
-        # Knee point calculation
-        kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
-                         curve='concave', direction='decreasing',
-                         interp_method='piecewise', online=False)
-
-        # Check if knee point is valid
-        if kn.knee is not None:
-            knee_value = binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values
-            if knee_value.size > 0:
-                knee_point = (kn.knee, knee_value[0])
-                # Ensure knee_point contains valid numbers
-                if all(isinstance(val, (int, float, np.number)) for val in knee_point):
-                    return knee_point
-    except Exception:
-        pass
-
-    return (None, None)
-
+    kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
+                     curve='concave', direction='decreasing',
+                     interp_method='piecewise', online=False)
+    knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0] if kn.knee is not None else None)
+    
 def binom_confint(successes, trials):
     if trials == 0:
         return np.nan, np.nan
