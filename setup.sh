@@ -26,26 +26,39 @@ install_packages() {
     sudo apt install -y git python3-pip python3-venv libopenblas-dev libopenjp2-7 || error "Failed to install required packages."
 }
 
+# Check if the repository already exists and update it
+update_repository() {
+    if [ -d "adsb-analysis/.git" ]; then
+        echo "Updating the existing adsb-analysis repository..."
+        cd adsb-analysis
+        git pull || error "Failed to update repository."
+    else
+        clone_repository
+    fi
+}
+
 # Clone the repository
 clone_repository() {
     echo "Cloning the adsb-analysis repository..."
     git clone https://github.com/dirkbeer/adsb-analysis.git || error "Failed to clone repository."
-
     cd adsb-analysis || error "Failed to enter the adsb-analysis directory."
 }
 
 # Create and activate virtual environment
 setup_venv() {
     echo "Setting up Python virtual environment..."
-    python3 -m venv venv || error "Failed to create a virtual environment."
-
+    # Check if the virtual environment already exists
+    if [ ! -d "venv" ]; then
+        python3 -m venv venv || error "Failed to create a virtual environment."
+    fi
     source venv/bin/activate || error "Failed to activate the virtual environment."
 }
 
-# Install Python dependencies
+# Install or update Python dependencies
 install_python_packages() {
-    echo "Installing Python packages..."
-    pip install -r requirements.txt || error "Failed to install Python packages."
+    echo "Installing or updating Python packages..."
+    pip install --upgrade pip
+    pip install -r requirements.txt || error "Failed to install or update Python packages."
 }
 
 # Print completion message
@@ -58,7 +71,7 @@ print_completion() {
 
 # Start the script
 install_packages
-clone_repository
+update_repository
 setup_venv
 install_python_packages
 print_completion
