@@ -18,6 +18,8 @@ if is_running_in_venv():
     from kneed import KneeLocator
     import matplotlib.pyplot as plt
     from scipy.stats import binom
+    from scipy.optimize import OptimizeWarning
+    import warnings
 else:
     print("Not running in the virtual environment. Run \"source venv/bin/activate\" first. ")
     sys.exit(1)
@@ -84,33 +86,31 @@ from scipy.optimize import OptimizeWarning
 def get_knee_point(binned_data):
     # Input validation
     if not isinstance(binned_data, pd.DataFrame):
-        return "Error: The input is not a pandas DataFrame."
+        print("Errors encountered in knee point calculation, no knee point will be plotted")
+        return None
 
     required_columns = ['distance', 'proportion']
     if not all(column in binned_data.columns for column in required_columns):
-        return f"Error: DataFrame must contain the following columns: {required_columns}"
+        print("Errors encountered in knee point calculation, no knee point will be plotted")
+        return None
 
     try:
-        # Using warnings.catch_warnings to handle specific runtime warnings
         with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")  # Change to 'error' to raise exceptions instead of warnings
+            warnings.simplefilter("always")
             kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
                              curve='concave', direction='decreasing',
                              interp_method='piecewise', online=False)
 
-            # Check if any warnings were raised
             if w:
-                warning_msgs = "\n".join([str(warning.message) for warning in w])
-                return f"Warning encountered: \n{warning_msgs}"
+                print("Errors encountered in knee point calculation, no knee point will be plotted")
+                return None
 
             knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0]) if kn.knee is not None else None
             return knee_point
 
-    except OptimizeWarning as e:
-        return f"Optimize Warning encountered: {e}"
-
-    except Exception as e:
-        return f"An unexpected error occurred: {e}"
+    except (OptimizeWarning, Exception):
+        print("Errors encountered in knee point calculation, no knee point will be plotted")
+        return None
 
 def binom_confint(successes, trials):
     if trials == 0:
