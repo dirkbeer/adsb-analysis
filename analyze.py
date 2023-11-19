@@ -44,7 +44,7 @@ def extract_data(file_content, latitude_home, longitude_home):
     json_data = json.loads(file_content)
     extracted_data = []
     for entry in json_data.get("files", []):
-        time = entry.get("now")
+        time = entry.get("now") * 1000
         for aircraft in entry.get("aircraft", []):
             aircraft_id = aircraft[0]
             latitude, longitude = aircraft[4] if len(aircraft) > 4 else None, aircraft[5] if len(aircraft) > 5 else None
@@ -108,7 +108,7 @@ def main():
     if all_data:
         earliest_date = min(d.datetime for d in all_data)
         latest_date = max(d.datetime for d in all_data)
-        date_range_str = f"{earliest_date.strftime('%Y-%m-%d')} to {latest_date.strftime('%Y-%m-%d')}"
+        date_range_str = f"{earliest_date.strftime('%Y-%m-%d %H:%M')} to {latest_date.strftime('%Y-%m-%d %H:%M')}"
     else:
         date_range_str = "No data available"
 
@@ -146,7 +146,7 @@ def main():
         post_filter_bin_count = len(binned_data)
         filtered_bins = pre_filter_bin_count - post_filter_bin_count 
         if filtered_bins > 1:        # It's normal for the last bin to have too few messages, don't bother the user if there is only one bin filtered
-            print(f"Filtering {filtered_bins} range bins because they had to few messages for valid statistics. Collect more data, or set --use-all on the command line to override.")
+            print(f"Filtering {filtered_bins} range bins because they had to few messages for valid statistics. Set --use-all on the command line to override.")
 
     # Calculate the confidence intervals
     binned_data[['conf_low', 'conf_high']] = binned_data.apply(
@@ -158,9 +158,10 @@ def main():
     binned_data['distance'] = binned_data['distance_bin'].apply(extract_upper_bound)
 
     # Find the knee in the curve using filtered data
+    #    finetune by pasting data here: https://arvkevi-kneed.streamlit.app/
     kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
                      curve='concave', direction='decreasing',
-                     S=1.0, interp_method='polynomial', online=True)
+                     S=1.0, interp_method='polynomial', polynomial_degree=7, online=False)
     knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0] if kn.knee is not None else None)
 
     # Plot with confidence intervals using filtered data
@@ -171,9 +172,9 @@ def main():
 
     if knee_point[1] is not None:
         plt.scatter(*knee_point, color='red')
-        plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0], knee_point[1]))
+        plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0]+2, knee_point[1]))
 
-    plt.title(f"ADS-B Receiver Performance / Message Reliability\nData Range: {date_range_str}")
+    plt.title("ADS-B Receiver Performance / Message Reliability")
     plt.xlabel("Distance (nautical miles)")
     plt.ylabel("Probability of Detection")
     if not args.dynamic_limits:
@@ -181,6 +182,7 @@ def main():
         plt.xlim(0.0, 300.0)
     plt.grid(True)
     plt.show()
+    plt.text(0.05, 0.01, f"Data Range: {date_range_str}", fontsize=8, ha='left', transform=plt.gcf().transFigure)
     plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
 
     # Save the plot
