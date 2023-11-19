@@ -113,13 +113,9 @@ print_completion() {
 print_completion() {
     echo ""
     success "Setup completed successfully."
+    echo ""
     echo "To run the analysis, execute:"
-    
-    local script_path="adsb-analysis/run_analysis.sh"
-    if [ -f "$script_path" ]; then
-        echo "cd adsb-analysis"
-    fi
-    echo "./run-analysis.sh"
+    echo "./adsb-analysis/run-analysis.sh"
     echo ""
 }
 
