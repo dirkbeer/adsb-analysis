@@ -115,7 +115,8 @@ print_completion() {
     success "Setup completed successfully."
     echo ""
     echo "To run the analysis, execute:"
-    echo "./adsb-analysis/run-analysis.sh"
+    echo ""
+    echo "    ./adsb-analysis/run_analysis.sh"
     echo ""
 }
 
