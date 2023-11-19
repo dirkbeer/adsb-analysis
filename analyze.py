@@ -191,7 +191,7 @@ def main():
                        binned_data['conf_high'] - binned_data['proportion']], fmt='o')
 
     knee_point = get_knee_point(binned_data)
-    if knee_point[1] is not None:
+    if knee_point is not None and knee_point[1] is not None:
         plt.scatter(*knee_point, color='red')
         plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0]+2, knee_point[1]))
 
