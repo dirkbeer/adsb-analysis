@@ -96,6 +96,9 @@ setup_venv() {
 
 # Install or update Python dependencies
 install_python_packages() {
+    echo "Uninstalling the kneed package if it exists..."
+    pip uninstall -y kneed 2>/dev/null || echo "kneed package not found."
+
     echo "Installing or updating Python packages..."
     pip install --upgrade pip
     pip install -r requirements.txt || error "Failed to install or update Python packages."
