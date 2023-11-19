@@ -72,27 +72,16 @@ class Data:
         self.distance /= 1852  # Convert to nautical miles
         self.datetime = datetime.datetime.utcfromtimestamp(self.time / 1000)
 
-# Function definitions from the second script
-def get_knee_point(binned_data):
-    kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
-                     curve='concave', direction='decreasing',
-                     interp_method='piecewise', online=False)
-    knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0] if kn.knee is not None else None)
-import pandas as pd
-import warnings
-from kneed import KneeLocator
-from scipy.optimize import OptimizeWarning
-
 def get_knee_point(binned_data):
     # Input validation
     if not isinstance(binned_data, pd.DataFrame):
         print("Errors encountered in knee point calculation, no knee point will be plotted")
-        return None
+        return (None, None)
 
     required_columns = ['distance', 'proportion']
     if not all(column in binned_data.columns for column in required_columns):
         print("Errors encountered in knee point calculation, no knee point will be plotted")
-        return None
+        return (None, None)
 
     try:
         with warnings.catch_warnings(record=True) as w:
@@ -103,14 +92,14 @@ def get_knee_point(binned_data):
 
             if w:
                 print("Errors encountered in knee point calculation, no knee point will be plotted")
-                return None
+                return (None, None)
 
             knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0]) if kn.knee is not None else None
             return knee_point
 
     except (OptimizeWarning, Exception):
         print("Errors encountered in knee point calculation, no knee point will be plotted")
-        return None
+        return (None, None)
 
 def binom_confint(successes, trials):
     if trials == 0:
