@@ -19,7 +19,6 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
 * The P(D) stays high (90%-100%) at low ranges where the signal is well above the detection threshold of the receiver. 
 * At the range where the signal gets near the detection threshold, P(D) starts dropping rapidly.
 * Where this transition happens (the "knee") is a good indication of sensitivity and performance of the receiver/amplifier/filter/antenna system.
-* Note that the code tries to identify the knee range, but it doesn't always work. 
 
 ![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/c886a056-473b-4d5b-b506-6a182b4e70b9)
 
@@ -46,11 +45,7 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
     ```bash
     (venv) sdr@sdr:~/adsb-analysis $
     ```
-5) Install the required Python packages (this will take a while): 
-   ```bash
-   pip install numpy matplotlib scipy pandas kneed
-   ```
-   or
+5) Install the required Python packages (this may take a while): 
    ```bash
    pip install -r requirements.txt
    ```
