@@ -20,7 +20,7 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
 * At the range where the signal gets near the detection threshold, P(D) starts dropping rapidly.
 * Where this transition happens (the "knee") is a good indication of sensitivity and performance of the receiver/amplifier/filter/antenna system.
 
-![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/c886a056-473b-4d5b-b506-6a182b4e70b9)
+![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/50ad5353-8fda-4dac-9223-5b6f663862c1)
 
 
 **Setup** (run again to update to latest)
@@ -35,7 +35,7 @@ curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh
 
 **Command line options**
 
-Don't use these routinely unless you understand them and have a specific reason.
+Not needed unless you have a specific reason.
 
 ```
 usage: analyze.py [-h] [--dynamic-limits] [--use-all] [--figure-filename FIGURE_FILENAME]
