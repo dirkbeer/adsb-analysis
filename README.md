@@ -22,6 +22,13 @@ The plot below is an example using 4 hours of data. It shows roughly the pattern
 
 ![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/c886a056-473b-4d5b-b506-6a182b4e70b9)
 
+
+**Easy setup** (experimental, may not be working correctly yet)
+1) Run
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh | bash
+   ```
+
 **First-time setup**
 
 1) Install the required packages on your Wingbits Raspberry Pi:
