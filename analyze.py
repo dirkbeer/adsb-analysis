@@ -74,6 +74,13 @@ def extract_upper_bound(interval):
 
 # Integrated main function
 def main():
+    # Process command line arguments
+    parser = argparse.ArgumentParser(description="Script to analyze ADS-B Receiver Performance")
+    parser.add_argument('--dynamic-limits', '-dl', action='store_true', help='Use dynamic limits to ensure all data is visible')
+    parser.add_argument('--use-all', '-a', action='store_true', help='Calculate statistics on range bins even if there is insufficient data for valid statistics')
+    parser.add_argument('--figure-filename', '-ffn', type=str, default='receiver_performance.png', help='Filename for the saved plot')
+    args = parser.parse_args()
+    
     # Extract latitude and longitude from config
     latitude_home, longitude_home = extract_lat_lon_from_config(config_file_path)
     print(f"Home location from {config_file_path}: {latitude_home}, {longitude_home}")
@@ -96,18 +103,20 @@ def main():
             print(f"OS error occurred with file {filename}: {e}")
             continue
 
-    # Process arguments for plotting
-    parser = argparse.ArgumentParser(description="Script to analyze ADS-B Receiver Performance")
-    parser.add_argument('--dynamic-limits', '-dl', action='store_true', help='Use dynamic limits to ensure all data is visible')
-    parser.add_argument('--use-all', '-a', action='store_true', help='Calculate statistics on range bins even if there is insufficient data for valid statistics')
-    parser.add_argument('--figure-filename', '-ffn', type=str, default='receiver_performance.png', help='Filename for the saved plot')
-    args = parser.parse_args()
+    times = {d.time for d in all_data}
+    data_per_time_and_aircraft = {}
+    for d in all_data:
+        if d.time not in data_per_time_and_aircraft:
+            data_per_time_and_aircraft[d.time] = {}
+        data_per_time_and_aircraft[d.time][d.aircraft_id] = d
 
-    # Process and plot data
-    dat = pd.DataFrame.from_records(
-        [(d.aircraft_id, d.distance, int(d.time in data_per_time_and_aircraft and d.aircraft_id in data_per_time_and_aircraft[d.time])) for d in all_data],
-        columns=["aircraft_id", "distance", "present"]
-    )
+    dat = []
+    sorted_times = sorted(times)
+    for i, current_time in enumerate(sorted_times):
+        next_time = sorted_times[i + 1] if i + 1 < len(sorted_times) else None
+        for aircraft_id, d in data_per_time_and_aircraft[current_time].items():
+            present_in_next = next_time is not None and aircraft_id in data_per_time_and_aircraft[next_time]
+            dat.append((aircraft_id, d.distance, int(present_in_next)))
 
     # Bin the distances into intervals and calculate the proportion of presence
     dat['distance_bin'] = pd.cut(dat['distance'], bins=np.arange(0, dat['distance'].max() + 10, 10), include_lowest=True, right=False)
