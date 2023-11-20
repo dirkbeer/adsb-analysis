@@ -1,54 +1,62 @@
 # adsb-analysis
 
-ADS-B Receiver Performance - Message Reliability at Distance
+***ADS-B Receiver Performance - Maximum Reliable Range***
 
-This looks at how reliably you receive ADS-B messages over a range of distance from your location. Reliability drops off with distance, but the better your system, the farther out it will receive reliably.
+This looks at how reliably you receive ADS-B messages over a range of distance from your location. Reliability drops off with distance, but the better your system, the farther out it will receive reliably. The plots show a *maximum reliable range*.
 
-The reliability metric used is probability of detection P(D) of an aircraft's message in the current measurement interval, given that that the aircraft's message was received in the previous interval:
+<p align="center">
+  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/70962cfc-5a4f-4621-a2ac-19664e25addb" alt="knee plot">
+</p>
+
+**Setup the code** (run again to update to latest)
+```bash
+curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh | bash
+```
+
+**Run the analysis**
+```bash
+~/adsb-analysis/run_analysis.sh
+```
+
+<p align="center">
+  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/893a9c18-ef02-4adf-a811-46254d177576" alt="output">
+</p>
+
+&nbsp;&nbsp;&nbsp;Ctrl-click the link in the resulting output to see the plot.
+
+**Requirements**
+
+&nbsp;&nbsp;&nbsp;&nbsp;readsb (included in the wingbits.com install)
+<br><br>
+
+---
+
+***Theory***
+
+The reliability metric used is probability of detection P(D) of an aircraft's message in the current 8-second measurement interval, given that that the aircraft's message was received in the previous interval:
 
 $$
 P(D_{i+1} \mid D_i)
 $$
 
-The intervals used are those in the tar1090 data, specified by `INTERVAL` in `/etc/default/tar1090`, `INTERVAL=8` seconds by default. The analysis runs on all the data stored by tar1090. The amount of data stored by tar1090 is specified by `HISTORY_SIZE` in `/etc/default/tar1090`, `HISTORY_SIZE=450` (1 hour) by default (450 snapshots * 8 seconds per snapshot / 3600 seconds per hour = 1 hour).
+This method doesn't need to know ground truth of which airplanes are out there and when they transmitted. It takes advantage of the fact that aircraft repeat the transmission every few seconds. 
 
-To get a good dataset for this analysis, you should have tar1090 collect more data. For example, try setting `HISTORY_SIZE=1800` in `/etc/default/tar1090` (4 hours), and running the analysis around 2pm to capture the 10ma-2pm midday air traffic.
+If you don't hear the aircraft again in a few seconds, it's probably because reception at that range is unreliable, not because it disappeared (thanks to @thegristleking for that explanation). 
 
-The plot below is an example using 4 hours of data. It shows roughly the pattern expected in theory:
+Maximum reliable range is better than many graph1090 metrics if you are optimizing for lots of quality data:
+* graph1090's *Peak Range* and *Avg Max Range* are misleading because they tell you where you can occasionally get lucky. *Maximum reliable range* tells you how far out you can receive complete quality data.
+* graph1090's *Message Rate* and *Aircraft Seen/Tracked* are misleading because they fluctuate by the minute depending on time of day and flight schedules. The *maximum reliable range* is stable so you can be sure changes where due to your setup.
+
+***Usage***
+
+The optimization procedure I'm currently using is: 
+
+1) set the gain to make sure it's as high as possible without overloading the receiver (e.g. using autogain `for i in {0..30}; do sudo autogain1090; sleep 120; done &`),
+2) wait an hour for some data and then check the knee range with adsb-analysis,
+3) modify my setup and repeat.
+
+The plot above is an example using 2 hours of data. It shows roughly the pattern expected in theory:
 
 * The P(D) stays high (90%-100%) at low ranges where the signal is well above the detection threshold of the receiver. 
 * At the range where the signal gets near the detection threshold, P(D) starts dropping rapidly.
-* Where this transition happens (the "knee") is a good indication of sensitivity and performance of the receiver/amplifier/filter/antenna system.
-
-![image](https://github.com/dirkbeer/adsb-analysis/assets/6425332/50ad5353-8fda-4dac-9223-5b6f663862c1)
-
-**Requires**
-
-&nbsp;&nbsp;&nbsp;&nbsp;[readsb](https://github.com/wiedehopf/readsb), which is included in the wingbits.com install
-<br><br>
-
-**Setup** (run again to update to latest)
-```bash
-curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh | bash
-```
-
-**Running the analysis**
-```bash
-~/adsb-analysis/run_analysis.sh
-```
-
-**Command line options**
-
-Not needed unless you have a specific reason.
-
-```
-usage: analyze.py [-h] [--dynamic-limits] [--use-all] [--figure-filename FIGURE_FILENAME]
-
-Script to analyze ADS-B Receiver Performance
-
-optional arguments:
-  -h, --help                                                Show this help message and exit
-  --dynamic-limits, -dl                                     Use dynamic limits to ensure all data is visible
-  --use-all, -a                                             Calculate statistics on range bins even if there is insufficient data for valid statistics
-  --figure-filename FIGURE_FILENAME, -ffn FIGURE_FILENAME   Filename for the saved plot
-```
+* Where this transition happens (the "knee") is the *maximum reliable range* of the receiver/amplifier/filter/antenna system.
