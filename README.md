@@ -40,8 +40,8 @@ The optimization procedure I'm currently using is:
 
 The plot above is an example using 2 hours of data. It shows roughly the pattern expected in theory:
 
-* The P(D) stays high (90%-100%) at low ranges where the signal is well above the detection threshold of the receiver. 
-* At the range where the signal gets near the detection threshold, P(D) starts dropping rapidly.
+* The reliability stays high (90%-100%) at low ranges where the signal is well above the detection threshold of the receiver. 
+* At the range where the signal gets near the detection threshold, reliability starts dropping rapidly.
 * Where this transition happens (the "knee") is the *maximum reliable range* of the receiver/amplifier/filter/antenna system.
 <br>
 
@@ -55,9 +55,9 @@ $$
 
 This method doesn't need to know ground truth of which airplanes are out there and when they transmitted. It takes advantage of the fact that aircraft repeat the transmission every few seconds. 
 
-If you don't hear the aircraft again in a few seconds, it's probably because reception at that range is unreliable, not because it disappeared (thanks to @thegristleking for that explanation). 
+If you don't hear the aircraft again in a few seconds, it's probably because reception at that range is unreliable, not because it disappeared (thanks to @thegristleking for that clear way of explaining it). 
 
-Maximum reliable range is better than many graph1090 metrics if you are optimizing for lots of quality data:
+*Maximum reliable range* is better than many graph1090 metrics if you are optimizing for lots of quality data:
 * graph1090's *Peak Range* and *Avg Max Range* are misleading because they tell you where you can occasionally get lucky. *Maximum reliable range* tells you how far out you can receive complete quality data.
 * graph1090's *Message Rate* and *Aircraft Seen/Tracked* are misleading because they fluctuate by the minute depending on time of day and flight schedules. The *maximum reliable range* is stable so you can be sure changes where due to your setup.
 
