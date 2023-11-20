@@ -198,17 +198,17 @@ def main():
 
     knee_point = get_knee_point(binned_data)
     if knee_point[1] is not None:
-        plt.scatter(*knee_point, color='red')
-        plt.annotate(f"Knee at {knee_point[0]} nautical miles", (knee_point[0]+2, knee_point[1]))
+        plt.plot(knee_point[0], knee_point[1], marker='x', markersize=10, color='red', linestyle='None')
+        plt.annotate(f"Max Reliable Range \"knee\": {knee_point[0]} nautical miles", (knee_point[0]+2, knee_point[1]))
 
-    plt.title("ADS-B Receiver Performance / Message Reliability")
+    plt.title("ADS-B Receiver Performance / Maximum Reliable Range")
     plt.xlabel("Distance (nautical miles)")
     plt.ylabel("Probability of Detection")
     if not args.dynamic_limits:
         plt.ylim(0.7, 1.0)
         plt.xlim(0.0, 300.0)
     plt.grid(True)
-    plt.show()
+
     plt.text(0.05, 0.01, f"Data Range: {date_range_str}", fontsize=8, ha='left', transform=plt.gcf().transFigure)
     plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
 
