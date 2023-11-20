@@ -10,9 +10,9 @@ source venv/bin/activate
 if [[ "$VIRTUAL_ENV" != "" ]]; then
     echo "Virtual environment activated."
 
-    # Run the analysis script
-    ./analyze.py
-    #./analyze.py --use-all
+    # Run the analysis script (only uncomment one of these)
+    #./analyze.py
+    ./analyze.py --use-all
 
     # Check if analyze.py ran successfully
     if [[ $? -eq 0 ]]; then
