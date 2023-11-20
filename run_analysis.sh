@@ -3,6 +3,19 @@
 # Change to the directory of the script
 cd "$(dirname "$0")"
 
+# Fetch updates from the remote repository
+git fetch > /dev/null 2>&1
+
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse @{u})
+BASE=$(git merge-base @ @{u})
+
+if [ $LOCAL = $REMOTE ]; then
+    echo "Your copy of adsb-analysis is up to date."
+elif [ $LOCAL = $BASE ]; then
+    echo "Updates available, run 'curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh | bash' to get the latest (this will overwrite any local changes)."
+fi
+
 # Activate the Python virtual environment
 source venv/bin/activate
 

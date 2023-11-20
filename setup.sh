@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Check if the script is running in non-interactive mode
+NON_INTERACTIVE=${NON_INTERACTIVE:-false}
+
 # Define some colors for echo outputs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -26,55 +29,46 @@ install_packages() {
     sudo apt install -y git python3-pip python3-venv libopenblas-dev libopenjp2-7 || error "Failed to install required packages."
 }
 
-update_repository() {
-    if [ -d ".git" ]; then
-        # Assuming the .git directory is in the current directory, no need to cd into "adsb-analysis"
-        echo "Checking for local changes in the existing adsb-analysis repository..."
-        
-        # Rest of the function remains the same
-        # ...
-    else
-        clone_repository
-    fi
-}
-
 # Check if the repository already exists and update it
 update_repository() {
-    local repo_path="adsb-analysis"
-    
-    # Check if the repository is in the current directory
-    if [ -d "$repo_path/.git" ]; then
-        echo "Checking for local changes in the existing $repo_path repository..."
-        cd "$repo_path"
-    elif [ -d ".git" ]; then
-        echo "Checking for local changes in the existing repository..."
-    else
-        clone_repository
-        return
-    fi
+    # Change to the directory where this script is located
+    SCRIPT_DIR=$(dirname "$0")
+    cd "$SCRIPT_DIR"
 
-    # Check for uncommitted changes in the git directory
-    if ! $NON_INTERACTIVE && ! git diff-index --quiet HEAD --; then
-        # Prompt the user for action on local changes
-        read -p "Local changes detected. Would you like to overwrite them? (y/N): " user_choice
-        case $user_choice in
-            [Yy]* )
-                echo "Overwriting local changes..."
-                git reset --hard HEAD
-                git clean -fd
-                ;;
-            * )
-                echo "Keeping local changes. Update cancelled."
-                exit 0
-                ;;
-        esac
-    elif $NON_INTERACTIVE; then
-        echo "Non-interactive mode detected. Overwriting local changes..."
-        git reset --hard HEAD
-        git clean -fd
+    # Check for .git directory to confirm it's a git repository
+    if [ -d ".git" ]; then
+        echo ""
+        echo "Checking for local changes in the existing repository..."
+
+        # Fetch updates from the remote repository silently
+        git fetch > /dev/null 2>&1
+
+        # Check for differences between the local and remote repositories
+        LOCAL=$(git rev-parse @)
+        REMOTE=$(git rev-parse @{u})
+
+	if [ $LOCAL != $REMOTE ]; then
+	    if [ "$NON_INTERACTIVE" = "false" ]; then
+	        echo "Updates are available. This will overwrite any local changes."
+	        read -p "Do you want to proceed? (y/n): " user_input
+	        if [[ $user_input == "y" || $user_input == "Y" ]]; then
+	            git reset --hard @{u}
+	            git pull
+	            echo "Updates applied successfully."
+	        else
+	            echo "Update aborted by user."
+	            exit 0
+	        fi
+	    else
+	        # Default action in non-interactive mode
+	        git reset --hard @{u}
+	        git pull
+	        echo "Updates applied automatically in non-interactive mode."
+	    fi
+	else
+	    echo "Your copy of the repository is up to date."
+	fi
     fi
-    echo "Updating repository..."
-    git pull || error "Failed to update repository."
 }
 
 # Clone the repository
@@ -87,7 +81,6 @@ clone_repository() {
 # Create and activate virtual environment
 setup_venv() {
     echo "Setting up Python virtual environment..."
-    # Check if the virtual environment already exists
     if [ ! -d "venv" ]; then
         python3 -m venv venv || error "Failed to create a virtual environment."
     fi
@@ -106,14 +99,6 @@ install_python_packages() {
 
 # Print completion message
 print_completion() {
-    success "Setup completed successfully."
-    echo "To run the analysis, execute:"
-    echo "cd adsb-analysis"
-    echo "./run_analysis.sh"
-}
-
-# Print completion message
-print_completion() {
     echo ""
     success "Setup completed successfully."
     echo ""
@@ -124,8 +109,8 @@ print_completion() {
 }
 
 # Start the script
-install_packages
 update_repository
+install_packages
 setup_venv
 install_python_packages
 print_completion
