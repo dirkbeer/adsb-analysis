@@ -8,7 +8,7 @@ This looks at how reliably you receive ADS-B messages over a range of distance f
   <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/39edac08-4905-45e6-b69c-96ce5bdfbac9" alt="knee plot">
 </p>
 
-**Setup the code** (run again to update to latest)
+**Setup the code** (run again to update to latest but note that it will overwrite any customizations)
 ```bash
 curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh | bash
 ```
