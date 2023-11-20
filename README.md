@@ -35,8 +35,9 @@ curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh
 The optimization procedure I'm currently using is: 
 
 1) set the gain to make sure it's as high as possible without overloading the receiver (e.g. using autogain `for i in {0..30}; do sudo autogain1090; sleep 120; done &`),
-2) wait an hour for some data and then check the maximum reliable "knee" range with adsb-analysis,
-3) modify my setup and repeat.
+2) delete the previous tar1090 data `sudo rm /run/tar1090/*`,
+3) wait some time for data (for me ~ 1 hour is sufficient) and then check the maximum reliable "knee" range with adsb-analysis,
+4) modify my setup and repeat.
 
 The plot above is an example using 2 hours of data. It shows roughly the pattern expected in theory:
 
