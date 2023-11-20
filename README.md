@@ -5,7 +5,7 @@
 This looks at how reliably you receive ADS-B messages over a range of distance from your location. Reliability drops off with distance, but the better your system, the farther out it will receive reliably. The plots show a *maximum reliable range*.
 
 <p align="center">
-  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/70962cfc-5a4f-4621-a2ac-19664e25addb" alt="knee plot">
+  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/39edac08-4905-45e6-b69c-96ce5bdfbac9" alt="knee plot">
 </p>
 
 **Setup the code** (run again to update to latest)
@@ -19,7 +19,7 @@ curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh
 ```
 
 <p align="center">
-  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/893a9c18-ef02-4adf-a811-46254d177576" alt="output">
+  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/d9b10809-b9b1-4a8e-98d1-23cb520b8a80" alt="output">
 </p>
 
 &nbsp;&nbsp;&nbsp;Ctrl-click the link in the resulting output to see the plot.
