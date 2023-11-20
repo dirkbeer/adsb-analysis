@@ -5,7 +5,7 @@
 This looks at how reliably you receive ADS-B messages over a range of distance from your location. Reliability drops off with distance, but the better your system, the farther out it will receive reliably. The plots show a *maximum reliable range*.
 
 <p align="center">
-  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/cb3200c7-edf2-4bf1-9e10-c1176069f025" alt="knee plot">
+  <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/70962cfc-5a4f-4621-a2ac-19664e25addb" alt="knee plot">
 </p>
 
 **Setup the code** (run again to update to latest)
@@ -55,7 +55,7 @@ The optimization procedure I'm currently using is:
 2) wait an hour for some data and then check the knee range with adsb-analysis,
 3) modify my setup and repeat.
 
-The plot above is an example using just 15 minutes of data. It shows roughly the pattern expected in theory:
+The plot above is an example using 2 hours of data. It shows roughly the pattern expected in theory:
 
 * The P(D) stays high (90%-100%) at low ranges where the signal is well above the detection threshold of the receiver. 
 * At the range where the signal gets near the detection threshold, P(D) starts dropping rapidly.
