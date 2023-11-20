@@ -15,9 +15,9 @@ if is_running_in_venv():
     import argparse
     import pandas as pd
     import numpy as np
-    from kneed import KneeLocator
     import matplotlib.pyplot as plt
     from scipy.stats import binom
+    from scipy.optimize import curve_fit
 else:
     print("Not running in the virtual environment. Run \"source venv/bin/activate\" first. ")
     sys.exit(1)
@@ -70,21 +70,32 @@ class Data:
         self.distance /= 1852  # Convert to nautical miles
         self.datetime = datetime.datetime.utcfromtimestamp(self.time / 1000)
 
+def piecewise_linear(x, x0, y0, m):
+    return np.piecewise(x, [x < x0, x >= x0], [lambda x: y0, lambda x: m * (x - x0) + y0])
+
 def get_knee_point(binned_data):
     binned_data['distance'] = binned_data['distance'].astype(float)
-    piecewise_params0 = (np.mean(binned_data['distance']), np.max(binned_data['proportion']), \
-                        (np.min(binned_data['proportion']) - np.max(binned_data['proportion'])) \
-                        / (np.max(binned_data['distance']) - np.mean(binned_data['distance'])) )
-    kn = KneeLocator(binned_data['distance'], binned_data['proportion'], 
-                     curve='concave', direction='decreasing',
-                     interp_method='piecewise', piecewise_params=piecewise_params0, online=False)
-    if kn.knee is not None:
-        knee_point = (kn.knee, binned_data.loc[binned_data['distance'] == kn.knee, 'proportion'].values[0])
-    else:
-        print("Unable to determine knee point")
-        knee_point = (None, None)
-    return knee_point
-    
+    piecewise_params0 = (np.mean(binned_data['distance']), np.max(binned_data['proportion']), 
+                         (np.min(binned_data['proportion']) - np.max(binned_data['proportion'])) 
+                         / (np.max(binned_data['distance']) - np.mean(binned_data['distance'])))
+
+    # Calculate the variance of each binomial proportion
+    p = binned_data['proportion'].values
+    n = binned_data['total_count'].values
+    variances = n * p * (1 - p)
+
+    # Inverse of variances as weights (avoid division by zero)
+    with np.errstate(divide='ignore'):
+        weights = 1 / variances
+        weights[~np.isfinite(weights)] = 0  # Handle any potential division by zero
+
+    fitted_params, _ = curve_fit(piecewise_linear, 
+                                 binned_data['distance'].values, 
+                                 binned_data['proportion'].values, 
+                                 p0=piecewise_params0, 
+                                 sigma=weights)
+    return fitted_params
+
 def binom_confint(successes, trials):
     if trials == 0:
         return np.nan, np.nan
@@ -172,6 +183,8 @@ def main():
     ).reset_index()
     binned_data['proportion'] = binned_data['present_count'] / binned_data['total_count']
 
+    print(binned_data[['distance_bin', 'proportion', 'total_count']])
+
     # Filter the data to include only rows where total_count > 30 to ensure valid statistics
     if not args.use_all:
         pre_filter_bin_count = len(binned_data)
@@ -190,16 +203,23 @@ def main():
     # Extract the far ranges from the bin name
     binned_data['distance'] = binned_data['distance_bin'].apply(extract_upper_bound)
 
+    # Find the knee point
+    fitted_params = get_knee_point(binned_data)
+    (x, y, m) = fitted_params
+    print(fitted_params)
+
     # Plot with confidence intervals using filtered data
     plt.figure(figsize=(10, 8))
     plt.errorbar(binned_data['distance'], binned_data['proportion'], 
                  yerr=[binned_data['proportion'] - binned_data['conf_low'], 
                        binned_data['conf_high'] - binned_data['proportion']], fmt='o')
 
-    knee_point = get_knee_point(binned_data)
-    if knee_point[1] is not None:
-        plt.plot(knee_point[0], knee_point[1], marker='x', markersize=10, color='red', linestyle='None')
-        plt.annotate(f"Max Reliable Range \"knee\": {knee_point[0]} nautical miles", (knee_point[0]+2, knee_point[1]))
+    # Plot the piecewise linear fit
+    plt.plot([0, x], [y, y], color='lightgray', linewidth=3)
+    delta = max(binned_data['distance']) - x
+    x1 = x + delta
+    y1 = y + m * delta
+    plt.plot([x, x1], [y, y1], color='lightgray', linewidth=3)
 
     plt.title("ADS-B Receiver Performance / Maximum Reliable Range")
     plt.xlabel("Distance (nautical miles)")
@@ -211,6 +231,9 @@ def main():
 
     plt.text(0.05, 0.01, f"Data Range: {date_range_str}", fontsize=8, ha='left', transform=plt.gcf().transFigure)
     plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
+    plt.text(20, 0.83, f"Near Range Reliability: {round(fitted_params[1] , 2)}", fontsize=16)
+    plt.text(20, 0.82, f"    Max Reliable Range: {int(round(fitted_params[0], 0))} nautical miles", fontsize=16)
+
 
     # Save the plot
     plt.savefig(args.figure_filename)
