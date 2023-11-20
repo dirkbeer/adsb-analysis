@@ -22,7 +22,6 @@ curl -sSL https://raw.githubusercontent.com/dirkbeer/adsb-analysis/main/setup.sh
   <img src="https://github.com/dirkbeer/adsb-analysis/assets/6425332/d9b10809-b9b1-4a8e-98d1-23cb520b8a80" alt="output">
 </p>
 
-&nbsp;&nbsp;&nbsp;Ctrl-click the link in the resulting output to see the plot.
 
 **Requirements**
 
