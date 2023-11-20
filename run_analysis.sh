@@ -8,7 +8,6 @@ source venv/bin/activate
 
 # Check if the Python virtual environment was activated successfully
 if [[ "$VIRTUAL_ENV" != "" ]]; then
-    echo "Virtual environment activated."
 
     # Run the analysis script (only uncomment one of these)
     ./analyze.py
@@ -28,10 +27,10 @@ if [[ "$VIRTUAL_ENV" != "" ]]; then
 
         # Copy the image to the web server directory
         sudo cp ./receiver_performance.png /usr/local/share/tar1090/html
-        echo "The image has been copied to the web server tar1090 directory."
+        echo "Receiver performance plot copied to the tar1090 web directory."
 
         # Provide the user with the URL to view the image
-        echo "You can view the receiver performance plot at"
+        echo "Ctrl-click the link to view in your browser:"
         echo ""
         echo "    http://$IP_ADDRESS/tar1090/receiver_performance.png"
         echo ""

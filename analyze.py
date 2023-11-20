@@ -5,7 +5,6 @@ def is_running_in_venv():
     return sys.prefix != sys.base_prefix
 
 if is_running_in_venv():
-    print("Running in a virtual environment.")
     import gzip
     import json
     import glob
@@ -79,21 +78,10 @@ def get_knee_point(binned_data):
                          (np.min(binned_data['proportion']) - np.max(binned_data['proportion'])) 
                          / (np.max(binned_data['distance']) - np.mean(binned_data['distance'])))
 
-    # Calculate the variance of each binomial proportion
-    p = binned_data['proportion'].values
-    n = binned_data['total_count'].values
-    variances = n * p * (1 - p)
-
-    # Inverse of variances as weights (avoid division by zero)
-    with np.errstate(divide='ignore'):
-        weights = 1 / variances
-        weights[~np.isfinite(weights)] = 0  # Handle any potential division by zero
-
     fitted_params, _ = curve_fit(piecewise_linear, 
                                  binned_data['distance'].values, 
                                  binned_data['proportion'].values, 
-                                 p0=piecewise_params0, 
-                                 sigma=weights)
+                                 p0=piecewise_params0)
     return fitted_params
 
 def binom_confint(successes, trials):
@@ -117,11 +105,12 @@ def main():
     parser.add_argument('--figure-filename', '-ffn', type=str, default='receiver_performance.png', help='Filename for the saved plot')
     args = parser.parse_args()
     
+    print("Loading data ...")
+
     # Extract latitude and longitude from config
     latitude_home, longitude_home = extract_lat_lon_from_config(config_file_path)
-    print(f"Home location from {config_file_path}: {latitude_home}, {longitude_home}")
 
-    # Process and extract data
+    # Load and extract data
     file_pattern = f"{data_dir}/chunk_*.gz"
     filenames = glob.glob(file_pattern)
     all_data = []
@@ -155,7 +144,9 @@ def main():
                           f"({hours} hours, {minutes} minutes)")
     else:
         date_range_str = "No data available"
+    print(f"Data Range: {date_range_str}")
 
+    print("Analyzing reliability ...")
     times = {d.time for d in all_data}
     data_per_time_and_aircraft = {}
     for d in all_data:
@@ -183,8 +174,9 @@ def main():
     ).reset_index()
     binned_data['proportion'] = binned_data['present_count'] / binned_data['total_count']
 
-    print(binned_data[['distance_bin', 'proportion', 'total_count']])
+    print(binned_data[['distance_bin', 'proportion', 'total_count']].to_string(index=False))
 
+    print("Calculating statistics ...")
     # Filter the data to include only rows where total_count > 30 to ensure valid statistics
     if not args.use_all:
         pre_filter_bin_count = len(binned_data)
@@ -206,13 +198,14 @@ def main():
     # Find the knee point
     fitted_params = get_knee_point(binned_data)
     (x, y, m) = fitted_params
-    print(fitted_params)
+    print(f"Estimated ...")
+    print(f"   Near range reliability:          {round(100*y,1)}%")
+    print(f"   Maximum reliable range:          {round(x,1)} nautical miles")
+    print(f"   Far range reliability loss:      {round(1000*m,2)}% each 10 nautical miles")
 
-    # Plot with confidence intervals using filtered data
+
+    print("Plotting results ...")
     plt.figure(figsize=(10, 8))
-    plt.errorbar(binned_data['distance'], binned_data['proportion'], 
-                 yerr=[binned_data['proportion'] - binned_data['conf_low'], 
-                       binned_data['conf_high'] - binned_data['proportion']], fmt='o')
 
     # Plot the piecewise linear fit
     plt.plot([0, x], [y, y], color='lightgray', linewidth=3)
@@ -221,9 +214,14 @@ def main():
     y1 = y + m * delta
     plt.plot([x, x1], [y, y1], color='lightgray', linewidth=3)
 
+    # Plot with confidence intervals using filtered data
+    plt.errorbar(binned_data['distance'], binned_data['proportion'], 
+                 yerr=[binned_data['proportion'] - binned_data['conf_low'], 
+                       binned_data['conf_high'] - binned_data['proportion']], fmt='o')
+
     plt.title("ADS-B Receiver Performance / Maximum Reliable Range")
     plt.xlabel("Distance (nautical miles)")
-    plt.ylabel("Probability of Detection")
+    plt.ylabel("Reliability (probability of detection)")
     if not args.dynamic_limits:
         plt.ylim(0.7, 1.0)
         plt.xlim(0.0, 300.0)
@@ -231,8 +229,8 @@ def main():
 
     plt.text(0.05, 0.01, f"Data Range: {date_range_str}", fontsize=8, ha='left', transform=plt.gcf().transFigure)
     plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
-    plt.text(20, 0.83, f"Near Range Reliability: {round(fitted_params[1] , 2)}", fontsize=16)
-    plt.text(20, 0.82, f"    Max Reliable Range: {int(round(fitted_params[0], 0))} nautical miles", fontsize=16)
+    plt.text(20, 0.83, f"Near range reliability:  {int(round(100*fitted_params[1], 0))}%", fontsize=14)
+    plt.text(20, 0.82, f"Max reliable range:     {int(round(fitted_params[0], 0))} nautical miles", fontsize=14)
 
 
     # Save the plot
