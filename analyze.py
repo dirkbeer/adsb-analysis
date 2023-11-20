@@ -73,14 +73,17 @@ def piecewise_linear(x, x0, y0, m):
     return np.piecewise(x, [x < x0, x >= x0], [lambda x: y0, lambda x: m * (x - x0) + y0])
 
 def get_knee_point(binned_data):
+    if len(binned_data) < 4:
+        print("Not enough data for reliable range assessment.")
+        return None
     binned_data['distance'] = binned_data['distance'].astype(float)
-    piecewise_params0 = (np.mean(binned_data['distance']), np.max(binned_data['proportion']), 
-                         (np.min(binned_data['proportion']) - np.max(binned_data['proportion'])) 
+    piecewise_params0 = (np.mean(binned_data['distance']), np.max(binned_data['proportion']),
+                         (np.min(binned_data['proportion']) - np.max(binned_data['proportion']))
                          / (np.max(binned_data['distance']) - np.mean(binned_data['distance'])))
 
-    fitted_params, _ = curve_fit(piecewise_linear, 
-                                 binned_data['distance'].values, 
-                                 binned_data['proportion'].values, 
+    fitted_params, _ = curve_fit(piecewise_linear,
+                                 binned_data['distance'].values,
+                                 binned_data['proportion'].values,
                                  p0=piecewise_params0)
     return fitted_params
 
@@ -104,7 +107,7 @@ def main():
     parser.add_argument('--use-all', '-a', action='store_true', help='Calculate statistics on range bins even if there is insufficient data for valid statistics')
     parser.add_argument('--figure-filename', '-ffn', type=str, default='receiver_performance.png', help='Filename for the saved plot')
     args = parser.parse_args()
-    
+
     print("Loading data ...")
 
     # Extract latitude and longitude from config
@@ -161,7 +164,7 @@ def main():
         for aircraft_id, d in data_per_time_and_aircraft[current_time].items():
             present_in_next = next_time is not None and aircraft_id in data_per_time_and_aircraft[next_time]
             output_data.append((aircraft_id, d.distance, int(present_in_next)))
-    
+
     dat = pd.DataFrame(output_data, columns=["aircraft_id", "distance", "present"])
 
     # Bin the distances into intervals and calculate the proportion of presence
@@ -182,7 +185,7 @@ def main():
         pre_filter_bin_count = len(binned_data)
         binned_data = binned_data[binned_data['total_count'] >= 30]
         post_filter_bin_count = len(binned_data)
-        filtered_bins = pre_filter_bin_count - post_filter_bin_count 
+        filtered_bins = pre_filter_bin_count - post_filter_bin_count
         if filtered_bins > 1:        # It's normal for the last bin to have too few messages, don't bother the user if there is only one bin filtered
             print(f"Filtering {filtered_bins} range bins because they had too few messages for valid statistics. Uncomment \"./analyze.py --use-all\" in run_analysis.sh to override")
 
@@ -191,33 +194,37 @@ def main():
         lambda row: binom_confint(row['present_count'], row['total_count']),
         axis=1, result_type='expand'
     )
-    
+
     # Extract the far ranges from the bin name
     binned_data['distance'] = binned_data['distance_bin'].apply(extract_upper_bound)
 
     # Find the knee point
     fitted_params = get_knee_point(binned_data)
-    (x, y, m) = fitted_params
-    print(f"Estimated ...")
-    print(f"   Near range reliability:          {round(100*y,1)}%")
-    print(f"   Maximum reliable range:          {round(x,1)} nautical miles")
-    print(f"   Far range reliability loss:      {round(1000*m,2)}% each 10 nautical miles")
+    if fitted_params is not None:
+        (x, y, m) = fitted_params
+        print(f"Estimated ...")
+        print(f"   Near range reliability:          {round(100*y,1)}%")
+        print(f"   Maximum reliable range:          {round(x,1)} nautical miles")
+        print(f"   Far range reliability loss:      {round(1000*m,2)}% each 10 nautical miles")
 
 
     print("Plotting results ...")
     plt.figure(figsize=(10, 8))
 
-    # Plot the piecewise linear fit
-    plt.plot([0, x], [y, y], color='lightgray', linewidth=3)
-    delta = max(binned_data['distance']) - x
-    x1 = x + delta
-    y1 = y + m * delta
-    plt.plot([x, x1], [y, y1], color='lightgray', linewidth=3)
-
     # Plot with confidence intervals using filtered data
-    plt.errorbar(binned_data['distance'], binned_data['proportion'], 
-                 yerr=[binned_data['proportion'] - binned_data['conf_low'], 
+    plt.errorbar(binned_data['distance'], binned_data['proportion'],
+                 yerr=[binned_data['proportion'] - binned_data['conf_low'],
                        binned_data['conf_high'] - binned_data['proportion']], fmt='o')
+
+    if fitted_params is not None:
+        # Plot the piecewise linear fit
+        plt.plot([0, x], [y, y], color='lightgray', linewidth=3)
+        delta = max(binned_data['distance']) - x
+        x1 = x + delta
+        y1 = y + m * delta
+        plt.plot([x, x1], [y, y1], color='lightgray', linewidth=3)
+        plt.text(20, 0.83, f"Near range reliability:  {int(round(100*fitted_params[1], 0))}%", fontsize=14)
+        plt.text(20, 0.82, f"Max reliable range:     {int(round(fitted_params[0], 0))} nautical miles", fontsize=14)
 
     plt.title("ADS-B Receiver Performance / Maximum Reliable Range")
     plt.xlabel("Distance (nautical miles)")
@@ -229,9 +236,6 @@ def main():
 
     plt.text(0.05, 0.01, f"Data Range: {date_range_str}", fontsize=8, ha='left', transform=plt.gcf().transFigure)
     plt.text(0.95, 0.01, "https://github.com/dirkbeer/adsb-analysis", fontsize=8, ha='right', transform=plt.gcf().transFigure)
-    plt.text(20, 0.83, f"Near range reliability:  {int(round(100*fitted_params[1], 0))}%", fontsize=14)
-    plt.text(20, 0.82, f"Max reliable range:     {int(round(fitted_params[0], 0))} nautical miles", fontsize=14)
-
 
     # Save the plot
     plt.savefig(args.figure_filename)
