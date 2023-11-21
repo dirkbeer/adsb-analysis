@@ -58,7 +58,7 @@ This method doesn't need to know ground truth of which airplanes are out there a
 
 If you don't hear the aircraft again in a few seconds, it's probably because reception at that range is unreliable, not because it disappeared (thanks to @thegristleking for that clear way of explaining it). 
 
-*Maximum reliable range* is better than many graph1090 metrics if you are optimizing for lots of quality data:
+*Maximum reliable range* is better than many graph1090 metrics if you want to optimize for lots of quality data:
 * graph1090's *Peak Range* and *Avg Max Range* are misleading because they tell you where you can occasionally get lucky. *Maximum reliable range* tells you how far out you can receive complete quality data.
 * graph1090's *Message Rate* and *Aircraft Seen/Tracked* are misleading because they fluctuate by the minute depending on time of day and flight schedules. The *maximum reliable range* is stable so you can be sure changes where due to your setup.
 
