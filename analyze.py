@@ -5,6 +5,7 @@ def is_running_in_venv():
     return sys.prefix != sys.base_prefix
 
 if is_running_in_venv():
+    import subprocess
     import gzip
     import json
     import glob
@@ -24,6 +25,28 @@ else:
 # Global variables from the first script
 data_dir = '/run/tar1090'
 config_file_path = '/etc/default/readsb'
+device_name_path = '/etc/wingbits/device'
+
+with open(device_name_path, 'r') as file:
+    device_name = file.read().strip()
+
+
+def get_gain():
+    command = "ps aux | grep readsb"
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = process.communicate()
+    ps_output = out.decode()
+    if err:
+        print("Error:", err.decode())
+    else:
+        gain_regex = r'--gain ([\-\d\.]+)'
+        gain_match = re.search(gain_regex, ps_output)
+        if gain_match:
+            gain_value = gain_match.group(1)
+        else:
+            gain_value = None
+    return gain_value
+
 
 def extract_lat_lon_from_config(config_file_path):
     with open(config_file_path, 'r') as file:
@@ -198,6 +221,12 @@ def main():
     # Extract the far ranges from the bin name
     binned_data['distance'] = binned_data['distance_bin'].apply(extract_upper_bound)
 
+    print(f"\nWingbits ID: {device_name}")
+
+    # Get the currently set gain value
+    gain_value = get_gain()
+    print(f"Gain currently set to {gain_value}\n")
+
     # Find the knee point
     fitted_params = get_knee_point(binned_data)
     if fitted_params is not None:
@@ -206,7 +235,6 @@ def main():
         print(f"   Near range reliability:          {round(100*y,1)}%")
         print(f"   Maximum reliable range:          {round(x,1)} nautical miles")
         print(f"   Far range reliability loss:      {round(1000*m,2)}% each 10 nautical miles")
-
 
     print("Plotting results ...")
     plt.figure(figsize=(10, 8))
@@ -226,7 +254,7 @@ def main():
         plt.text(20, 0.83, f"Near range reliability:  {int(round(100*fitted_params[1], 0))}%", fontsize=14)
         plt.text(20, 0.82, f"Max reliable range:     {int(round(fitted_params[0], 0))} nautical miles", fontsize=14)
 
-    plt.title("ADS-B Receiver Performance / Maximum Reliable Range")
+    plt.title(f"ADS-B Receiver Performance / Maximum Reliable Range\nID: {device_name}  Gain: {gain_value}")
     plt.xlabel("Distance (nautical miles)")
     plt.ylabel("Reliability (probability of detection)")
     if not args.dynamic_limits:
