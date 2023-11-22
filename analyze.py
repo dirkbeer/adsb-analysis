@@ -27,9 +27,13 @@ data_dir = '/run/tar1090'
 config_file_path = '/etc/default/readsb'
 device_name_path = '/etc/wingbits/device'
 
-with open(device_name_path, 'r') as file:
-    device_name = file.read().strip()
-
+def get_wingbits_id():
+    try:
+        with open(device_name_path, 'r') as file:
+            device_name = file.read().strip()
+    except FileNotFoundError:
+        device_name = None
+    return device_name
 
 def get_gain():
     command = "ps aux | grep readsb"
@@ -170,7 +174,6 @@ def main():
                           f"({hours} hours, {minutes} minutes)")
     else:
         date_range_str = "No data available"
-    print(f"Data Range: {date_range_str}")
 
     print("Analyzing reliability ...")
     times = {d.time for d in all_data}
@@ -221,11 +224,14 @@ def main():
     # Extract the far ranges from the bin name
     binned_data['distance'] = binned_data['distance_bin'].apply(extract_upper_bound)
 
-    print(f"\nWingbits ID: {device_name}")
-
-    # Get the currently set gain value
+    device_name = get_wingbits_id()
     gain_value = get_gain()
-    print(f"Gain currently set to {gain_value}\n")
+
+    print("")
+    print(f"Wingbits ID: {device_name}")
+    print(f"Gain:        {gain_value}")
+    print(f"Data Range:  {date_range_str}")
+    print("")
 
     # Find the knee point
     fitted_params = get_knee_point(binned_data)
@@ -236,6 +242,7 @@ def main():
         print(f"   Maximum reliable range:          {round(x,1)} nautical miles")
         print(f"   Far range reliability loss:      {round(1000*m,2)}% each 10 nautical miles")
 
+    print("")
     print("Plotting results ...")
     plt.figure(figsize=(10, 8))
 
@@ -251,10 +258,12 @@ def main():
         x1 = x + delta
         y1 = y + m * delta
         plt.plot([x, x1], [y, y1], color='lightgray', linewidth=3)
-        plt.text(20, 0.83, f"Near range reliability:  {int(round(100*fitted_params[1], 0))}%", fontsize=14)
-        plt.text(20, 0.82, f"Max reliable range:     {int(round(fitted_params[0], 0))} nautical miles", fontsize=14)
+        plt.text(20, 0.83, f"Wingbits ID:              {device_name}", fontsize=12)
+        plt.text(20, 0.82, f"Current gain setting:   {gain_value}", fontsize=12)
+        plt.text(20, 0.81, f"Near range reliability:  {int(round(100*fitted_params[1], 0))}%", fontsize=12)
+        plt.text(20, 0.80, f"Max reliable range:     {int(round(fitted_params[0], 0))} nautical miles", fontsize=12)
 
-    plt.title(f"ADS-B Receiver Performance / Maximum Reliable Range\nID: {device_name}  Gain: {gain_value}")
+    plt.title(f"ADS-B Receiver Performance / Maximum Reliable Range")
     plt.xlabel("Distance (nautical miles)")
     plt.ylabel("Reliability (probability of detection)")
     if not args.dynamic_limits:
