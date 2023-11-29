@@ -6,6 +6,8 @@ chunk_list_all
 output.csv
 data/
 *.png
+*.csv
+nohup.out
 
 # R
 .Rproj.user
