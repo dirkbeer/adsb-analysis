@@ -20,7 +20,7 @@ INTERVAL = 60
 SLACK = 5
 original_gain = None
 
-def read_json_with_retries(file_path, expected_keys, max_attempts=5, wait_seconds=3):
+def read_json_with_retries(file_path, expected_keys, max_attempts=10, wait_seconds=5):
     """
     Attempts to read a JSON file with specified expected keys.
 
@@ -39,14 +39,8 @@ def read_json_with_retries(file_path, expected_keys, max_attempts=5, wait_second
                 # Check if all expected keys are present
                 if all(key in data for key in expected_keys):
                     return data
-                else:
-                    print("Missing expected keys in JSON file.")
-        #except (json.JSONDecodeError, FileNotFoundError, OSError) as e:
-        #    print(f"Error reading file: {e}")
-        except Exception as e:
-            print(f"Unexpected error: {e}")
-            return None
-
+        except:
+            pass    
         # Wait before retrying
         time.sleep(wait_seconds)
         attempt += 1

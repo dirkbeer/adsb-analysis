@@ -5,6 +5,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 import subprocess
+import os
+
+DATA_DIR = './data'
+
+def human_readable_size(size, decimal_places=2):
+    """Convert bytes to human-readable file sizes."""
+    units = ['B', 'KB', 'MB', 'GB', 'TB']
+    for unit in units:
+        if size < 1024.0 or unit == units[-1]:
+            return f"{size:.{decimal_places}f} {unit}"
+        size /= 1024.0
+
+def get_file_names(data_dir, file_extension):
+    """Retrieve all files with file_extension in the data directory and sort them by file age."""
+    files = [f for f in os.listdir(data_dir) if f.endswith(file_extension)]
+    files.sort(key=lambda x: os.path.getmtime(os.path.join(data_dir, x)))
+    return files
+
+def display_files(files):
+    """Display files with their sizes."""
+    for idx, file in enumerate(files, 1):
+        file_path = os.path.join(DATA_DIR, file)
+        file_size = human_readable_size(os.path.getsize(file_path))
+        print(f"{idx}. {file} ({file_size})")
+
+def get_user_choice(files, data_dir):
+    """Prompt the user to choose a file."""
+    choice = int(input("\nEnter the number of the file you want to choose: "))
+    if 1 <= choice <= len(files):
+        return os.path.join(data_dir, files[choice - 1])
+    raise ValueError("Invalid choice.")
 
 def read_data(file_path):
     """Reads data from a CSV file."""
@@ -72,7 +103,7 @@ def plot_confidence_intervals(df, group_column, value_column, plot_file):
 
     plt.figure()
     plt.errorbar(means.index, means, yerr=ci, fmt='o', ecolor='r', capsize=5)
-    plt.ylim([0, max(means + ci)])
+    #plt.ylim([0, max(means + ci)])
     
     # Adding grid lines and labels at unique gain values
     unique_gains = df[group_column].unique()
@@ -88,8 +119,14 @@ def plot_confidence_intervals(df, group_column, value_column, plot_file):
 
 
 def main():
-    data_file = './data.csv'
-    df = read_data(data_file)
+
+    files = get_file_names(DATA_DIR, '.csv')
+    if not files:
+        raise ValueError("No .csv files found in the data directory.")
+    display_files(files)
+    chosen_file = get_user_choice(files, DATA_DIR)
+
+    df = read_data(chosen_file)
 
     calculate_median_adjusted_values(df, 'run', 'messages_valid')
 
