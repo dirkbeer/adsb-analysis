@@ -26,7 +26,7 @@ install_packages() {
     sudo apt update || error "Failed to update package list."
 
     echo "Installing required packages..."
-    sudo apt install -y git python3-pip python3-venv libopenblas-dev libopenjp2-7 || error "Failed to install required packages."
+    sudo apt install -y git python3-pip python3-venv libopenblas-dev libopenjp2-7 rtl-sdr || error "Failed to install required packages."
 }
 
 # Check if the repository already exists and update it
