@@ -20,13 +20,6 @@ INTERVAL = 60
 SLACK = 5
 original_gain = None
 
-import json
-import time
-
-import json
-import time
-import os
-
 def read_json_with_retries(file_path, expected_keys, max_attempts=5, wait_seconds=3):
     """
     Attempts to read a JSON file with specified expected keys.
@@ -63,6 +56,7 @@ def read_json_with_retries(file_path, expected_keys, max_attempts=5, wait_second
 
 
 def restore_original_gain():
+    global original_gain
     if original_gain is not None:
         command = f"sudo readsb-gain {original_gain}"
         try:
