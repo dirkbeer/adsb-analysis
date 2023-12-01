@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Cycle</title>
+    <style>
+        #image-container {
+            height: 100vh; /* Full height of the viewport */
+            width: 100vw;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Prevents scrollbars if the image is wider than the viewport */
+        }
+
+        img {
+            max-height: 100vh;
+            width: auto;
+            max-width: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="image-container">
+        <img id="cycle-image" src="path_to_first_image.jpg" alt="Cycling Image">
+    </div>
+
+    <script>
+        let currentImage = 0;
+        const images = ["reliable_range.png", "gain_messages.png", "gain_distance.png"];
+
+        const imageElement = document.getElementById('cycle-image');
+        imageElement.src = images[currentImage]; // Set the initial image
+
+        document.getElementById('cycle-image').addEventListener('click', function() {
+            currentImage = (currentImage + 1) % images.length;
+            this.src = images[currentImage];
+        });
+    </script>
+</body>
+</html>

@@ -32,7 +32,7 @@ def display_files(files):
 
 def get_user_choice(files, data_dir):
     """Prompt the user to choose a file."""
-    choice = int(input("\nEnter the number of the file you want to choose: "))
+    choice = int(input("\nEnter the number of the file: "))
     if 1 <= choice <= len(files):
         return os.path.join(data_dir, files[choice - 1])
     raise ValueError("Invalid choice.")
@@ -48,7 +48,7 @@ def fit_polynomial(df, x_column, y_column, order=2):
 
 def plot_data_with_fit(df, x, y, poly_function, plot_file):
     """Plots data points with polynomial fit and saves the plot."""
-    plt.figure()
+    plt.figure(figsize=(10, 8))
     plt.scatter(df[x], df[y], label='Data Points')
     x_range = np.linspace(df[x].min(), df[x].max(), 500)
     plt.plot(x_range, poly_function(x_range), color='red', label='Polynomial Fit')
@@ -60,7 +60,7 @@ def plot_data_with_fit(df, x, y, poly_function, plot_file):
 
 def plot_data(df, x, y, plot_file):
     """Plots data points and saves the plot."""
-    plt.figure()
+    plt.figure(figsize=(10, 8))
     plt.scatter(df[x], df[y], label='Data Points')
     plt.xlabel(x.replace('_', ' ').title())
     plt.ylabel(y.replace('_', ' ').title())
@@ -101,7 +101,7 @@ def plot_confidence_intervals(df, group_column, value_column, plot_file):
     std_err = grouped.sem()
     ci = std_err * stats.t.ppf((1 + 0.95) / 2., grouped.count() - 1)
 
-    plt.figure()
+    plt.figure(figsize=(10, 8))
     plt.errorbar(means.index, means, yerr=ci, fmt='o', ecolor='r', capsize=5)
     #plt.ylim([0, max(means + ci)])
     

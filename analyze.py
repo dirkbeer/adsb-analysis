@@ -132,7 +132,7 @@ def main():
     parser = argparse.ArgumentParser(description="Script to analyze ADS-B Receiver Performance")
     parser.add_argument('--dynamic-limits', '-dl', action='store_true', help='Use dynamic limits to ensure all data is visible')
     parser.add_argument('--use-all', '-a', action='store_true', help='Calculate statistics on range bins even if there is insufficient data for valid statistics')
-    parser.add_argument('--figure-filename', '-ffn', type=str, default='receiver_performance.png', help='Filename for the saved plot')
+    parser.add_argument('--figure-filename', '-ffn', type=str, default='reliable_range.png', help='Filename for the saved plot')
     args = parser.parse_args()
 
     print("Loading data ...")
