@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Image Cycle</title>
+    <title>adsb-analysis</title>
     <style>
         #image-container {
-            height: 100vh; /* Full height of the viewport */
+            height: 100vh;
             width: 100vw;
             text-align: center;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* Prevents scrollbars if the image is wider than the viewport */
+            overflow: hidden;
         }
 
         img {
@@ -19,24 +19,100 @@
             width: auto;
             max-width: none;
         }
+
+        #navigation {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+        }
+
+        .arrow {
+            cursor: pointer;
+            margin: 0 20px;
+        }
+
+        #indicator {
+            display: flex;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: gray;
+            border-radius: 50%;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+
+        .active {
+            background-color: black;
+        }
     </style>
 </head>
 <body>
     <div id="image-container">
-        <img id="cycle-image" src="path_to_first_image.jpg" alt="Cycling Image">
+        <img id="cycle-image" src="reliable_range.png" alt="Plot has not been created">
     </div>
 
-    <script>
-        let currentImage = 0;
-        const images = ["reliable_range.png", "gain_messages.png", "gain_distance.png"];
+    <div id="navigation">
+        <div id="backward" class="arrow">←</div>
+        <div id="indicator">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <div id="forward" class="arrow">→</div>
+    </div>
+<script>
+let currentImage = 0;
+const images = ["reliable_range.png", "gain_messages.png", "gain_distance.png"];
+const imageElement = document.getElementById('cycle-image');
+const dots = document.querySelectorAll('.dot');
 
-        const imageElement = document.getElementById('cycle-image');
-        imageElement.src = images[currentImage]; // Set the initial image
+// Function to load and display the current image
+function loadImage() {
+    imageElement.src = images[currentImage];
+    updateIndicator(currentImage);
+}
 
-        document.getElementById('cycle-image').addEventListener('click', function() {
-            currentImage = (currentImage + 1) % images.length;
-            this.src = images[currentImage];
-        });
-    </script>
+// Function to update the indicator dots
+function updateIndicator(index) {
+    dots.forEach(dot => dot.classList.remove('active'));
+    dots[index].classList.add('active');
+}
+
+// Function to change the image with error handling
+function changeImage(step) {
+    currentImage = (currentImage + step + images.length) % images.length;
+    loadImage();
+}
+
+// Event listener for forward navigation
+document.getElementById('forward').addEventListener('click', function() {
+    changeImage(1);
+});
+
+// Event listener for backward navigation
+document.getElementById('backward').addEventListener('click', function() {
+    changeImage(-1);
+});
+
+// Event listener for clicking on the image
+imageElement.addEventListener('click', function() {
+    changeImage(1);
+});
+
+// Event listener for handling image load errors
+imageElement.addEventListener('error', function() {
+    console.error(`Failed to load image: ${images[currentImage]}`);
+    changeImage(1); // Advance to the next image if the current one fails to load
+});
+
+// Initial image load
+loadImage();
+</script>
 </body>
 </html>
