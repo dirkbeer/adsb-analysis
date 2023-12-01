@@ -7,7 +7,9 @@ from scipy import stats
 import subprocess
 import os
 
-DATA_DIR = './data'
+DATA_DIR = '../data'
+OUTPUT_DIR = '../output'
+SERVER_DIR = '/usr/local/share/tar1090/html'
 
 def human_readable_size(size, decimal_places=2):
     """Convert bytes to human-readable file sizes."""
@@ -130,11 +132,11 @@ def main():
 
     calculate_median_adjusted_values(df, 'run', 'messages_valid')
 
-    plot_confidence_intervals(df, 'gain_actual', 'messages_valid_adjusted', 'gain_messages.png')
-    copy_file('./gain_messages.png', '/usr/local/share/tar1090/html')
+    plot_confidence_intervals(df, 'gain_actual', 'messages_valid_adjusted', OUTPUT_DIR + '/gain_messages.png')
+    copy_file(OUTPUT_DIR + '/gain_messages.png', SERVER_DIR)
 
-    plot_confidence_intervals(df, 'gain_actual', 'max_distance', 'gain_distance.png')
-    copy_file('./gain_distance.png', '/usr/local/share/tar1090/html')
+    plot_confidence_intervals(df, 'gain_actual', 'max_distance', OUTPUT_DIR + '/gain_distance.png')
+    copy_file(OUTPUT_DIR + '/gain_distance.png', SERVER_DIR)
 
 if __name__ == "__main__":
     main()
