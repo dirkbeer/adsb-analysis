@@ -23,8 +23,8 @@ source venv/bin/activate
 if [[ "$VIRTUAL_ENV" != "" ]]; then
 
     # Run the analysis script (only uncomment one of these)
-    ./analyze.py
-    #./analyze.py --use-all
+    ./src/analyze.py
+    #./src/analyze.py --use-all
 
     # Check if analyze.py ran successfully
     if [[ $? -eq 0 ]]; then
@@ -39,13 +39,14 @@ if [[ "$VIRTUAL_ENV" != "" ]]; then
         fi
 
         # Copy the image to the web server directory
-        sudo cp ./receiver_performance.png /usr/local/share/tar1090/html
+        sudo cp ./output/reliable_range.png /usr/local/share/tar1090/html
+        sudo cp ./output/adsb-analysis.html /usr/local/share/tar1090/html
         echo "Receiver performance plot copied to the tar1090 web directory."
 
         # Provide the user with the URL to view the image
         echo "Ctrl-click the link to view in your browser:"
         echo ""
-        echo "    http://$IP_ADDRESS/tar1090/receiver_performance.png"
+        echo "    http://$IP_ADDRESS/tar1090/adsb-analysis.html"
         echo ""
 
     else
