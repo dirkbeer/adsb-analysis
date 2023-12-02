@@ -12,7 +12,7 @@ import sys
 import time
 from datetime import datetime
 
-OUTPUT_FILE_PATH = './data'
+OUTPUT_FILE_PATH = '../data' # assumes script will be run from the src directory
 STATS_FILE = '/run/readsb/stats.json'
 AUTO_GAIN = -10
 INTERVAL_NAME = 'last1min'
