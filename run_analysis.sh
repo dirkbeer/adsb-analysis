@@ -3,6 +3,11 @@
 # Change to the directory of the script
 cd "$(dirname "$0")"
 
+# Check if ../output directory exists, and create it if not
+if [[ ! -d "../output" ]]; then
+    mkdir -p "../output"
+fi
+
 # Fetch updates from the remote repository
 git fetch > /dev/null 2>&1
 
@@ -39,12 +44,16 @@ if [[ "$VIRTUAL_ENV" != "" ]]; then
         fi
 
         # Copy the image to the web server directory
-        sudo cp ./output/reliable_range.png /usr/local/share/tar1090/html
-        sudo cp ./output/adsb-analysis.html /usr/local/share/tar1090/html
+        sudo cp ../output/reliable_range.png /usr/local/share/tar1090/html
+        sudo cp ../output/adsb-analysis.html /usr/local/share/tar1090/html
         echo "Receiver performance plot copied to the tar1090 web directory."
 
         # Provide the user with the URL to view the image
         echo "Ctrl-click the link to view in your browser:"
+        echo ""
+        echo "    http://$IP_ADDRESS/tar1090/reliable_range.png"
+        echo ""
+        echo "... or see all the adsb-analysis plots you've made at:"
         echo ""
         echo "    http://$IP_ADDRESS/tar1090/adsb-analysis.html"
         echo ""

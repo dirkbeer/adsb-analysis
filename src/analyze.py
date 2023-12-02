@@ -26,6 +26,7 @@ else:
 data_dir = '/run/tar1090'
 config_file_path = '/etc/default/readsb'
 device_name_path = '/etc/wingbits/device'
+FIGURE_FILENAME = '../output/reliable_range.png'
 
 def get_wingbits_id():
     try:
@@ -132,7 +133,7 @@ def main():
     parser = argparse.ArgumentParser(description="Script to analyze ADS-B Receiver Performance")
     parser.add_argument('--dynamic-limits', '-dl', action='store_true', help='Use dynamic limits to ensure all data is visible')
     parser.add_argument('--use-all', '-a', action='store_true', help='Calculate statistics on range bins even if there is insufficient data for valid statistics')
-    parser.add_argument('--figure-filename', '-ffn', type=str, default='reliable_range.png', help='Filename for the saved plot')
+    parser.add_argument('--figure-filename', '-ffn', type=str, default=FIGURE_FILENAME, help='Filename for the saved plot')
     args = parser.parse_args()
 
     print("Loading data ...")
